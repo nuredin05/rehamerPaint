@@ -4,13 +4,10 @@ const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const swaggerUi = require('swagger-ui-express');
-const { specs } = require('./config/swagger');
+const swaggerJsdoc = require('swagger-jsdoc');
 
+// Load configuration
 const config = require('./config');
-const logger = require('./utils/logger');
-const errorHandler = require('./middleware/error.middleware');
-const authMiddleware = require('./middleware/auth.middleware');
-const auditMiddleware = require('./middleware/audit.middleware');
 
 // Import routes
 const authRoutes = require('./routes/auth.routes');
@@ -24,62 +21,87 @@ const logisticsRoutes = require('./routes/logistics.routes');
 const adminRoutes = require('./routes/admin.routes');
 const reportRoutes = require('./routes/report.routes');
 
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'RehamerPaint ERP API',
+      version: '1.0.0',
+      description: 'Comprehensive API documentation for the RehamerPaint ERP System',
+      contact: {
+        name: 'RehamerPaint Support',
+        email: 'support@rehamerpaint.com'
+      }
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: 'Development server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    }
+  },
+  apis: ['./src/routes/*.js'] // Path to the API docs
+};
+
+const specs = swaggerJsdoc(swaggerOptions);
+
 const app = express();
 
 // Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: config.frontend.url,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
+app.use(compression());
+
+// Body parsing middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: config.rateLimit.windowMs,
-  max: config.rateLimit.maxRequests,
-  message: {
-    error: 'Too many requests from this IP, please try again later.'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
 });
-app.use('/api', limiter);
-
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(compression());
+app.use(limiter);
 
 // Request logging
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    timestamp: new Date().toISOString()
-  });
+  console.log(`${req.method} ${req.path}`);
   next();
 });
 
-// Audit logging for authenticated routes
-app.use('/api', auditMiddleware);
+// API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/hr', hrRoutes);
+app.use('/api/v1/inventory', inventoryRoutes);
+app.use('/api/v1/manufacturing', manufacturingRoutes);
+app.use('/api/v1/sales', salesRoutes);
+app.use('/api/v1/procurement', procurementRoutes);
+app.use('/api/v1/finance', financeRoutes);
+app.use('/api/v1/logistics', logisticsRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/reports', reportRoutes);
 
-// API Documentation
+// Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'RehamerPaint ERP API Documentation',
-  customfavIcon: '/favicon.ico',
   swaggerOptions: {
-    docExpansion: 'list',
-    operationsSorter: 'alpha',
-    tagsSorter: 'alpha',
     persistAuthorization: true,
     displayRequestDuration: true,
     filter: true,
     showExtensions: true,
     showCommonExtensions: true,
-    tryItOutEnabled: true
+    docExpansion: 'none'
   }
 }));
 
@@ -89,21 +111,19 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
-// API Routes
-app.use(`${config.api.prefix}/auth`, authRoutes);
-app.use(`${config.api.prefix}/hr`, authMiddleware.authenticate, hrRoutes);
-app.use(`${config.api.prefix}/inventory`, authMiddleware.authenticate, inventoryRoutes);
-app.use(`${config.api.prefix}/manufacturing`, authMiddleware.authenticate, manufacturingRoutes);
-app.use(`${config.api.prefix}/sales`, authMiddleware.authenticate, salesRoutes);
-app.use(`${config.api.prefix}/procurement`, authMiddleware.authenticate, procurementRoutes);
-app.use(`${config.api.prefix}/finance`, authMiddleware.authenticate, financeRoutes);
-app.use(`${config.api.prefix}/logistics`, authMiddleware.authenticate, logisticsRoutes);
-app.use(`${config.api.prefix}/admin`, authMiddleware.authenticate, authMiddleware.requireRole(['admin']), adminRoutes);
-app.use(`${config.api.prefix}/reports`, authMiddleware.authenticate, reportRoutes);
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'RehamerPaint ERP API',
+    version: '1.0.0',
+    status: 'running',
+    documentation: '/api-docs'
+  });
+});
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -112,11 +132,22 @@ app.use('*', (req, res) => {
     error: {
       code: 'NOT_FOUND',
       message: 'Endpoint not found'
-    }
+    },
+    timestamp: new Date().toISOString()
   });
 });
 
-// Error handling middleware
-app.use(errorHandler);
+// Error handler
+app.use((error, req, res, next) => {
+  console.error('Error:', error);
+  res.status(500).json({
+    success: false,
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: 'Internal server error'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 
 module.exports = app;
