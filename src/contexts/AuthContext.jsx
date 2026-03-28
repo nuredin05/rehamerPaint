@@ -36,15 +36,25 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (identifier, password) => {
     try {
+      console.log('🔐 Attempting login...', { identifier, password: '***' });
+      
       const response = await axios.post('http://localhost:3000/api/v1/auth/login', {
         identifier,
         password
       });
 
+      console.log('✅ Login response:', response.data);
+
       const { user: userData, tokens } = response.data.data;
       setUser(userData);
       localStorage.setItem('token', tokens.accessToken);
+      
+      console.log('✅ User logged in successfully');
     } catch (error) {
+      console.error('❌ Login error:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+      }
       throw new Error(error.response?.data?.error?.message || 'Login failed');
     }
   };
