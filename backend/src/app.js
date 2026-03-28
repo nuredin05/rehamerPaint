@@ -66,10 +66,14 @@ app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
+// Rate limiting (disabled in development — Strict Mode / HMR easily exceed 100 req/15min)
+const isProduction = process.env.NODE_ENV === 'production';
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: config.security.rateLimit.windowMs,
+  max: config.security.rateLimit.maxRequests,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => !isProduction
 });
 app.use(limiter);
 

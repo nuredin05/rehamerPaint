@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
-import apiService from '../services/api';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Custom hook for managing API data with loading, error states
 export const useApiData = (apiFunction, dependencies = []) => {
@@ -7,11 +6,15 @@ export const useApiData = (apiFunction, dependencies = []) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Inline fetchers change identity every render; keep latest in a ref so fetchData stays stable and useEffect does not loop.
+  const apiRef = useRef(apiFunction);
+  apiRef.current = apiFunction;
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await apiFunction();
+      const result = await apiRef.current();
       setData(result);
     } catch (err) {
       setError(err.message);
@@ -19,7 +22,7 @@ export const useApiData = (apiFunction, dependencies = []) => {
     } finally {
       setLoading(false);
     }
-  }, [apiFunction]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -37,11 +40,14 @@ export const useCrudOperations = (apiEndpoints) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const endpointsRef = useRef(apiEndpoints);
+  endpointsRef.current = apiEndpoints;
+
   const create = useCallback(async (data) => {
     try {
       setLoading(true);
       setError(null);
-      const result = await apiEndpoints.create(data);
+      const result = await endpointsRef.current.create(data);
       return { success: true, data: result };
     } catch (err) {
       const errorMessage = err.message || 'Failed to create item';
@@ -50,13 +56,13 @@ export const useCrudOperations = (apiEndpoints) => {
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoints.create]);
+  }, []);
 
   const update = useCallback(async (id, data) => {
     try {
       setLoading(true);
       setError(null);
-      const result = await apiEndpoints.update(id, data);
+      const result = await endpointsRef.current.update(id, data);
       return { success: true, data: result };
     } catch (err) {
       const errorMessage = err.message || 'Failed to update item';
@@ -65,13 +71,13 @@ export const useCrudOperations = (apiEndpoints) => {
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoints.update]);
+  }, []);
 
   const remove = useCallback(async (id) => {
     try {
       setLoading(true);
       setError(null);
-      await apiEndpoints.delete(id);
+      await endpointsRef.current.delete(id);
       return { success: true };
     } catch (err) {
       const errorMessage = err.message || 'Failed to delete item';
@@ -80,13 +86,13 @@ export const useCrudOperations = (apiEndpoints) => {
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoints.delete]);
+  }, []);
 
   const updateStatus = useCallback(async (id, status) => {
     try {
       setLoading(true);
       setError(null);
-      const result = await apiEndpoints.updateStatus(id, status);
+      const result = await endpointsRef.current.updateStatus(id, status);
       return { success: true, data: result };
     } catch (err) {
       const errorMessage = err.message || 'Failed to update status';
@@ -95,7 +101,7 @@ export const useCrudOperations = (apiEndpoints) => {
     } finally {
       setLoading(false);
     }
-  }, [apiEndpoints.updateStatus]);
+  }, []);
 
   return { create, update, remove, updateStatus, loading, error };
 };

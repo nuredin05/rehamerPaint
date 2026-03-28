@@ -25,6 +25,16 @@ module.exports = (sequelize) => {
       },
       field: 'department_id'
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: true,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      field: 'user_id'
+    },
     employeeCode: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -114,6 +124,9 @@ module.exports = (sequelize) => {
         fields: ['department_id']
       },
       {
+        fields: ['user_id']
+      },
+      {
         fields: ['is_active']
       }
     ]
@@ -170,9 +183,9 @@ module.exports = (sequelize) => {
       as: 'department'
     });
 
-    // Employee can have associated User account
-    Employee.hasOne(models.User, {
-      foreignKey: 'employeeId',
+    // Linked ERP login account (FK lives on employees.user_id — see User.hasOne employee)
+    Employee.belongsTo(models.User, {
+      foreignKey: 'userId',
       as: 'user'
     });
 

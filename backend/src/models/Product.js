@@ -240,35 +240,40 @@ module.exports = (sequelize) => {
       as: 'inventoryTransactions'
     });
 
-    // Product can be a finished product in BOM
-    Product.hasMany(models.BOM, {
-      foreignKey: 'finishedProductId',
-      as: 'bomAsFinished'
-    });
+    if (models.BOM) {
+      Product.hasMany(models.BOM, {
+        foreignKey: 'finishedProductId',
+        as: 'bomAsFinished'
+      });
+    }
 
-    // Product can be a raw material in BOM components
-    Product.hasMany(models.BOMComponent, {
-      foreignKey: 'rawMaterialId',
-      as: 'bomAsRawMaterial'
-    });
+    if (models.BOMComponent) {
+      Product.hasMany(models.BOMComponent, {
+        foreignKey: 'rawMaterialId',
+        as: 'bomAsRawMaterial'
+      });
+    }
 
-    // Product has many Production Orders
-    Product.hasMany(models.ProductionOrder, {
-      foreignKey: 'productId',
-      as: 'productionOrders'
-    });
+    if (models.ProductionOrder) {
+      Product.hasMany(models.ProductionOrder, {
+        foreignKey: 'productId',
+        as: 'productionOrders'
+      });
+    }
 
-    // Product appears in Sales Order Items
-    Product.hasMany(models.SalesOrderItem, {
-      foreignKey: 'productId',
-      as: 'salesOrderItems'
-    });
+    if (models.SalesOrderItem) {
+      Product.hasMany(models.SalesOrderItem, {
+        foreignKey: 'productId',
+        as: 'salesOrderItems'
+      });
+    }
 
-    // Product appears in Purchase Order Items
-    Product.hasMany(models.PurchaseOrderItem, {
-      foreignKey: 'productId',
-      as: 'purchaseOrderItems'
-    });
+    if (models.PurchaseOrderItem) {
+      Product.hasMany(models.PurchaseOrderItem, {
+        foreignKey: 'productId',
+        as: 'purchaseOrderItems'
+      });
+    }
   };
 
   return Product;

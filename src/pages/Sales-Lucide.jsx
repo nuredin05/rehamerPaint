@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import apiService from '../services/api';
+import { useApiData, useNotification } from '../hooks/useApiData';
 import {
   ShoppingCart,
   Users,
@@ -30,95 +32,13 @@ export const Sales = () => {
   const [activeTab, setActiveTab] = useState('orders');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const [orders, setOrders] = useState([
-    {
-      id: 'SO-001',
-      customer: 'ABC Construction',
-      product: 'Premium Paint - White',
-      quantity: 100,
-      amount: 2500.00,
-      date: '2026-03-28',
-      status: 'confirmed',
-      deliveryDate: '2026-04-02'
-    },
-    {
-      id: 'SO-002',
-      customer: 'XYZ Homes',
-      product: 'Premium Paint - Blue',
-      quantity: 50,
-      amount: 1250.00,
-      date: '2026-03-28',
-      status: 'pending',
-      deliveryDate: '2026-04-05'
-    },
-    {
-      id: 'SO-003',
-      customer: 'BuildRight Inc',
-      product: 'Primer Coat',
-      quantity: 200,
-      amount: 3000.00,
-      date: '2026-03-27',
-      status: 'shipped',
-      deliveryDate: '2026-03-30'
-    },
-  ]);
+  const { data: ordersRaw, loading: ordersLoading } = useApiData(() => apiService.getOrders(), []);
+  const { data: customersRaw, loading: customersLoading } = useApiData(() => apiService.getCustomers(), []);
+  const { data: invoicesRaw, loading: invoicesLoading } = useApiData(() => apiService.getInvoices(), []);
 
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: 'ABC Construction',
-      email: 'contact@abc.com',
-      phone: '+1234567890',
-      orders: 15,
-      totalSpent: 45200.00,
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'XYZ Homes',
-      email: 'info@xyz.com',
-      phone: '+1234567891',
-      orders: 8,
-      totalSpent: 28900.00,
-      status: 'active'
-    },
-    {
-      id: 3,
-      name: 'BuildRight Inc',
-      email: 'orders@buildright.com',
-      phone: '+1234567892',
-      orders: 23,
-      totalSpent: 67800.00,
-      status: 'active'
-    },
-  ]);
-
-  const [invoices, setInvoices] = useState([
-    {
-      id: 'INV-001',
-      customer: 'ABC Construction',
-      amount: 2500.00,
-      dueDate: '2026-04-15',
-      status: 'paid',
-      date: '2026-03-28'
-    },
-    {
-      id: 'INV-002',
-      customer: 'XYZ Homes',
-      amount: 1250.00,
-      dueDate: '2026-04-20',
-      status: 'pending',
-      date: '2026-03-28'
-    },
-    {
-      id: 'INV-003',
-      customer: 'BuildRight Inc',
-      amount: 3000.00,
-      dueDate: '2026-04-10',
-      status: 'overdue',
-      date: '2026-03-27'
-    },
-  ]);
+  const orders = Array.isArray(ordersRaw) ? ordersRaw : [];
+  const customers = Array.isArray(customersRaw) ? customersRaw : [];
+  const invoices = Array.isArray(invoicesRaw) ? invoicesRaw : [];
 
   // Modal states
   const [showOrderModal, setShowOrderModal] = useState(false);
@@ -149,123 +69,30 @@ export const Sales = () => {
     dueDate: ''
   });
 
-  // Notification state
-  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  const { notification, showNotification } = useNotification();
 
-  // Show notification
-  const showNotification = (message, type = 'success') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: '', type: 'success' });
-    }, 3000);
-  };
-
-  // Add new order
   const handleAddOrder = () => {
-    if (!newOrder.customer || !newOrder.product || !newOrder.quantity || !newOrder.amount) {
-      showNotification('Please fill all required fields', 'error');
-      return;
-    }
-
-    const orderToAdd = {
-      id: `SO-${String(orders.length + 1).padStart(3, '0')}`,
-      ...newOrder,
-      quantity: parseInt(newOrder.quantity),
-      amount: parseFloat(newOrder.amount),
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      deliveryDate: newOrder.deliveryDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-    };
-
-    setOrders([...orders, orderToAdd]);
-
-    // Update customer stats
-    const customerIndex = customers.findIndex(c => c.name === newOrder.customer);
-    if (customerIndex >= 0) {
-      const updatedCustomers = [...customers];
-      updatedCustomers[customerIndex].orders += 1;
-      updatedCustomers[customerIndex].totalSpent += orderToAdd.amount;
-      setCustomers(updatedCustomers);
-    }
-
-    setNewOrder({ customer: '', product: '', quantity: '', amount: '', deliveryDate: '' });
-    setShowOrderModal(false);
-    showNotification('Order added successfully', 'success');
+    showNotification('Create order via API is not wired to this form yet.', 'error');
   };
 
-  // Add new customer
   const handleAddCustomer = () => {
-    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone) {
-      showNotification('Please fill all required fields', 'error');
-      return;
-    }
-
-    const customerToAdd = {
-      id: customers.length + 1,
-      ...newCustomer,
-      orders: 0,
-      totalSpent: 0.00
-    };
-
-    setCustomers([...customers, customerToAdd]);
-    setNewCustomer({ name: '', email: '', phone: '', status: 'active' });
-    setShowCustomerModal(false);
-    showNotification('Customer added successfully', 'success');
+    showNotification('Create customer via API is not wired to this form yet.', 'error');
   };
 
-  // Add new invoice
   const handleAddInvoice = () => {
-    if (!newInvoice.customer || !newInvoice.amount || !newInvoice.dueDate) {
-      showNotification('Please fill all required fields', 'error');
-      return;
-    }
-
-    const invoiceToAdd = {
-      id: `INV-${String(invoices.length + 1).padStart(3, '0')}`,
-      ...newInvoice,
-      amount: parseFloat(newInvoice.amount),
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending'
-    };
-
-    setInvoices([...invoices, invoiceToAdd]);
-    setNewInvoice({ customer: '', amount: '', dueDate: '' });
-    setShowInvoiceModal(false);
-    showNotification('Invoice added successfully', 'success');
+    showNotification('Create invoice via API is not wired to this form yet.', 'error');
   };
 
-  // Update order status
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order =>
-      order.id === orderId
-        ? { ...order, status: newStatus }
-        : order
-    ));
-    showNotification('Order status updated', 'success');
+  const updateOrderStatus = () => {
+    showNotification('Update order status via API is not wired from this UI yet.', 'error');
   };
 
-  // Update invoice status
-  const updateInvoiceStatus = (invoiceId, newStatus) => {
-    setInvoices(invoices.map(invoice =>
-      invoice.id === invoiceId
-        ? { ...invoice, status: newStatus }
-        : invoice
-    ));
-    showNotification('Invoice status updated', 'success');
+  const updateInvoiceStatus = () => {
+    showNotification('Update invoice via API is not wired from this UI yet.', 'error');
   };
 
-  // Delete item
-  const deleteItem = (type, id) => {
-    if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-      if (type === 'order') {
-        setOrders(orders.filter(order => order.id !== id));
-      } else if (type === 'customer') {
-        setCustomers(customers.filter(customer => customer.id !== id));
-      } else if (type === 'invoice') {
-        setInvoices(invoices.filter(invoice => invoice.id !== id));
-      }
-      showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`, 'success');
-    }
+  const deleteItem = () => {
+    showNotification('Delete via API is not wired from this UI yet.', 'error');
   };
 
   // View item details

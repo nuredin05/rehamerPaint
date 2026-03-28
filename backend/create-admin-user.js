@@ -1,5 +1,4 @@
 // Create admin user for RehamerPaint ERP
-const bcrypt = require('bcryptjs');
 
 async function createAdminUser() {
   try {
@@ -13,19 +12,19 @@ async function createAdminUser() {
     await sequelize.authenticate();
     console.log('✅ Database connected successfully');
     
-    // Hash password
-    const hashedPassword = await bcrypt.hash('admin123', 12);
-    
-    // Create admin user
+    // Plain password: User model beforeCreate hook hashes passwordHash
+    // companyId must reference an existing companies row (seed or create company first)
     const user = await User.create({
       username: 'admin',
       email: 'admin@rehamerpaint.com',
-      passwordHash: hashedPassword,
+      passwordHash: 'admin123',
       firstName: 'System',
       lastName: 'Administrator',
+      role: 'admin',
       isActive: true,
       loginAttempts: 0,
-      lockedUntil: null
+      lockedUntil: null,
+      companyId: 1
     });
     
     console.log('✅ Admin user created successfully:', {

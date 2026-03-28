@@ -1,5 +1,4 @@
 // Create test user for RehamerPaint ERP
-const bcrypt = require('bcryptjs');
 const { sequelize } = require('./src/config/database');
 
 async function createTestUser() {
@@ -13,16 +12,14 @@ async function createTestUser() {
     // Import and initialize User model
     const { User } = require('./src/models');
     
-    // Hash password
-    const hashedPassword = await bcrypt.hash('admin123', 12);
-    
-    // Create test user
+    // Plain password: User model beforeCreate hook hashes passwordHash
     const user = await User.create({
       username: 'admin',
       email: 'admin@rehamerpaint.com',
-      passwordHash: hashedPassword,
+      passwordHash: 'admin123',
       firstName: 'System',
       lastName: 'Administrator',
+      role: 'admin',
       isActive: true,
       loginAttempts: 0,
       lockedUntil: null,

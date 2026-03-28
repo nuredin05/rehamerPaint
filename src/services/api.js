@@ -2,6 +2,26 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
+/** Origin only (e.g. http://localhost:3000) — health lives at /health, not under /api/v1 */
+function getBackendOrigin() {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+  return String(base).replace(/\/api\/v1\/?$/, '') || 'http://localhost:3000';
+}
+
+/**
+ * Parse JSON body from the backend standard envelope:
+ * success responses: { success, message, data?, ... }
+ * errors: { success: false, error: { message, ... } }
+ */
+function parseJsonBody(text) {
+  if (!text || !text.trim()) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
 class ApiService {
   // Generic request method
   async request(endpoint, options = {}) {
@@ -23,21 +43,47 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      
-      // Handle 401 Unauthorized - token expired
+      const rawText = await response.text();
+      const body = parseJsonBody(rawText);
+
+      const method = String(config.method || 'GET').toUpperCase();
+      const pathOnly = endpoint.split('?')[0];
+      const isLoginAttempt = method === 'POST' && pathOnly.endsWith('/auth/login');
+
+      // Failed login also returns 401 — do not clear session or hard-redirect
+      if (response.status === 401 && isLoginAttempt) {
+        const msg =
+          body?.error?.message ||
+          body?.message ||
+          'Invalid credentials';
+        throw new Error(msg);
+      }
+
+      // Authenticated requests: expired/invalid token
       if (response.status === 401) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
         window.location.href = '/login';
         throw new Error('Session expired. Please login again.');
       }
-      
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        const msg =
+          body?.error?.message ||
+          body?.message ||
+          `HTTP error! status: ${response.status}`;
+        throw new Error(msg);
       }
-      
-      return await response.json();
+
+      if (body && body.success === false) {
+        throw new Error(body.error?.message || body.message || 'Request failed');
+      }
+
+      if (body && Object.prototype.hasOwnProperty.call(body, 'data')) {
+        return body.data;
+      }
+
+      return body ?? {};
     } catch (error) {
       console.error('API request failed:', error);
       throw error;
@@ -124,7 +170,7 @@ class ApiService {
   
   // Orders
   async getOrders(params = {}) {
-    return this.get('/sales/orders', params);
+    return this.get('/sales/sales-orders', params);
   }
 
   async createOrder(orderData) {
@@ -511,12 +557,18 @@ class ApiService {
   
   // Health check
   async healthCheck() {
-    return this.get('/health');
+    const response = await fetch(`${getBackendOrigin()}/health`);
+    const rawText = await response.text();
+    const body = parseJsonBody(rawText);
+    if (!response.ok) {
+      throw new Error(body?.error?.message || body?.message || `Health check failed: ${response.status}`);
+    }
+    return body ?? {};
   }
 
-  // Get API documentation
-  async getApiDocs() {
-    return this.get('/api-docs');
+  /** Swagger UI is mounted at server root (not under /api/v1). */
+  getApiDocsUrl() {
+    return `${getBackendOrigin()}/api-docs`;
   }
 
   // Upload file (for features like import/export)
@@ -536,11 +588,17 @@ class ApiService {
         headers,
       });
 
+      const t = await response.text();
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`);
+        const err = parseJsonBody(t);
+        throw new Error(err?.error?.message || err?.message || `Upload failed: ${response.statusText}`);
       }
 
-      return await response.json();
+      const json = parseJsonBody(t);
+      if (json && Object.prototype.hasOwnProperty.call(json, 'data')) {
+        return json.data;
+      }
+      return json ?? {};
     } catch (error) {
       console.error('File upload failed:', error);
       throw error;
@@ -564,7 +622,9 @@ class ApiService {
       });
 
       if (!response.ok) {
-        throw new Error(`Export failed: ${response.statusText}`);
+        const t = await response.text();
+        const err = parseJsonBody(t);
+        throw new Error(err?.error?.message || err?.message || `Export failed: ${response.statusText}`);
       }
 
       return await response.blob();

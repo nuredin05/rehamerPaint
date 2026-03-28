@@ -1,8 +1,13 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate, requireRole } = require('../middleware/auth.middleware');
+const adminHandlers = require('../utils/adminHandlers');
 
 const router = express.Router();
+
+router.use(authenticate);
+router.use(requireRole('admin'));
 
 /**
  * @swagger
@@ -71,8 +76,7 @@ router.get('/users', [
   query('isActive').optional().isBoolean()
 ], async (req, res) => {
   try {
-    // TODO: Implement user listing logic (admin only)
-    return ResponseHelper.success(res, [], 'Users retrieved successfully');
+    return await adminHandlers.listUsers(req, res);
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve users');
   }
@@ -145,19 +149,52 @@ router.get('/users', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/users', [
-  body('username').notEmpty().withMessage('Username is required'),
   body('email').isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
-  body('role').isIn(['admin', 'manager', 'operator', 'viewer']).withMessage('Valid role is required'),
-  body('companyId').isInt().withMessage('Valid company ID is required')
+  body('password').optional().isLength({ min: 6 }),
+  body('username').optional(),
+  body('name').optional().isString(),
+  body('firstName').optional(),
+  body('lastName').optional(),
+  body('role').optional(),
+  body('companyId').optional().isInt(),
+  body('status').optional(),
+  body('department').optional()
 ], async (req, res) => {
   try {
-    // TODO: Implement user creation logic (admin only)
-    return ResponseHelper.created(res, {}, 'User created successfully');
+    return await adminHandlers.createUser(req, res);
   } catch (error) {
-    return ResponseHelper.error(res, 'Failed to create user');
+    return ResponseHelper.error(res, error.message || 'Failed to create user');
+  }
+});
+
+router.put('/users/:id', [
+  param('id').isInt().withMessage('Valid user ID is required'),
+  body('email').optional().isEmail()
+], async (req, res) => {
+  try {
+    return await adminHandlers.updateUser(req, res);
+  } catch (error) {
+    return ResponseHelper.error(res, error.message || 'Failed to update user');
+  }
+});
+
+router.delete('/users/:id', [
+  param('id').isInt().withMessage('Valid user ID is required')
+], async (req, res) => {
+  try {
+    return await adminHandlers.deleteUser(req, res);
+  } catch (error) {
+    return ResponseHelper.error(res, error.message || 'Failed to delete user');
+  }
+});
+
+router.put('/users/:id/toggle-status', [
+  param('id').isInt().withMessage('Valid user ID is required')
+], async (req, res) => {
+  try {
+    return await adminHandlers.toggleUserStatus(req, res);
+  } catch (error) {
+    return ResponseHelper.error(res, error.message || 'Failed to toggle user status');
   }
 });
 
@@ -399,10 +436,21 @@ router.post('/companies', [
  */
 router.get('/settings', async (req, res) => {
   try {
-    // TODO: Implement system settings retrieval logic (admin only)
-    return ResponseHelper.success(res, { settings: [] }, 'System settings retrieved successfully');
+    return await adminHandlers.listSettings(req, res);
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve system settings');
+  }
+});
+
+router.put('/settings/:id', [
+  param('id').isInt().withMessage('Valid setting ID is required'),
+  body('settingValue').optional(),
+  body('value').optional()
+], async (req, res) => {
+  try {
+    return await adminHandlers.updateSettingById(req, res);
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to update setting');
   }
 });
 
@@ -518,10 +566,17 @@ router.get('/audit-logs', [
   query('endDate').optional().isISO8601()
 ], async (req, res) => {
   try {
-    // TODO: Implement audit logs retrieval logic (admin only)
-    return ResponseHelper.success(res, [], 'Audit logs retrieved successfully');
+    return await adminHandlers.listAuditLogs(req, res);
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve audit logs');
+  }
+});
+
+router.post('/audit-logs', async (req, res) => {
+  try {
+    return await adminHandlers.createAuditLog(req, res);
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to create audit log');
   }
 });
 

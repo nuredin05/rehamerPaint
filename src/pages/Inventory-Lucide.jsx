@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import apiService from '../services/api';
+import { useApiData, useNotification } from '../hooks/useApiData';
 import {
   Package,
   ArrowDownLeft,
@@ -30,21 +32,20 @@ export const Inventory = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+  const { notification, showNotification } = useNotification();
 
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Premium Paint - White', sku: 'PNT-001', stock: 150, price: 25.99, status: 'in-stock' },
-    { id: 2, name: 'Premium Paint - Blue', sku: 'PNT-002', stock: 89, price: 27.99, status: 'low-stock' },
-    { id: 3, name: 'Premium Paint - Red', sku: 'PNT-003', stock: 0, price: 26.99, status: 'out-of-stock' },
-    { id: 4, name: 'Primer Coat', sku: 'PRM-001', stock: 200, price: 15.99, status: 'in-stock' },
-    { id: 5, name: 'Clear Varnish', sku: 'VRN-001', stock: 45, price: 22.99, status: 'in-stock' },
-  ]);
+  const { data: productsRaw, loading: productsLoading, refetch: refetchProducts } = useApiData(
+    () => apiService.getProducts(),
+    []
+  );
 
-  const [transactions, setTransactions] = useState([
-    { id: 1, type: 'in', product: 'Premium Paint - White', quantity: 50, date: '2026-03-28', user: 'Admin' },
-    { id: 2, type: 'out', product: 'Premium Paint - Blue', quantity: 25, date: '2026-03-28', user: 'John' },
-    { id: 3, type: 'in', product: 'Primer Coat', quantity: 100, date: '2026-03-27', user: 'Admin' },
-  ]);
+  const { data: transactionsRaw, loading: txLoading, refetch: refetchTransactions } = useApiData(
+    () => apiService.getInventoryTransactions(),
+    []
+  );
+
+  const products = Array.isArray(productsRaw) ? productsRaw : [];
+  const transactions = Array.isArray(transactionsRaw) ? transactionsRaw : [];
 
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -53,13 +54,6 @@ export const Inventory = () => {
     price: '',
     status: 'in-stock'
   });
-
-  const showNotification = (message, type = 'success') => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: '', type: 'success' });
-    }, 3000);
-  };
 
   const getStatusBadge = (status) => {
     const styles = {
@@ -96,29 +90,11 @@ export const Inventory = () => {
   };
 
   const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.sku || !newProduct.stock || !newProduct.price) {
-      showNotification('Please fill all required fields', 'error');
-      return;
-    }
-
-    const productToAdd = {
-      id: products.length + 1,
-      ...newProduct,
-      stock: parseInt(newProduct.stock),
-      price: parseFloat(newProduct.price)
-    };
-
-    setProducts([...products, productToAdd]);
-    setNewProduct({ name: '', sku: '', stock: '', price: '', status: 'in-stock' });
-    setShowAddModal(false);
-    showNotification('Product added successfully', 'success');
+    showNotification('Create product via API is not wired in this form yet — use DB or extend POST /inventory/products.', 'error');
   };
 
-  const deleteProduct = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter(product => product.id !== id));
-      showNotification('Product deleted successfully', 'success');
-    }
+  const deleteProduct = () => {
+    showNotification('Delete product API not enabled from this UI.', 'error');
   };
 
   const viewItemDetails = (item) => {
@@ -133,14 +109,31 @@ export const Inventory = () => {
   const outOfStockProducts = products.filter(p => p.status === 'out-of-stock').length;
   const totalStockValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = useMemo(
+    () =>
+      products.filter(
+        (product) =>
+          (product.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (product.sku || '').toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [products, searchTerm]
   );
 
-  const filteredTransactions = transactions.filter(transaction =>
-    transaction.product.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTransactions = useMemo(
+    () =>
+      transactions.filter((transaction) =>
+        (transaction.product || '').toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [transactions, searchTerm]
   );
+
+  if (productsLoading || txLoading) {
+    return (
+      <div className="flex items-center justify-center h-64 text-primaryClr">
+        Loading inventory…
+      </div>
+    );
+  }
 
   return (
     <div>

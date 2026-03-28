@@ -251,11 +251,12 @@ module.exports = (sequelize) => {
       as: 'creator'
     });
 
-    // PurchaseOrder has many Purchase Order Items
-    PurchaseOrder.hasMany(models.PurchaseOrderItem, {
-      foreignKey: 'purchaseOrderId',
-      as: 'items'
-    });
+    if (models.PurchaseOrderItem) {
+      PurchaseOrder.hasMany(models.PurchaseOrderItem, {
+        foreignKey: 'purchaseOrderId',
+        as: 'items'
+      });
+    }
   };
 
   return PurchaseOrder;

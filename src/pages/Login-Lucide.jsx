@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getPostLoginPath } from '../utils/authRoles';
 import {
   Eye,
   EyeOff,
@@ -17,7 +19,14 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login } = useAuth();
+  const navigate = useNavigate();
+  const { user, login, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user?.role) {
+      navigate(getPostLoginPath(user.role), { replace: true });
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +34,10 @@ export const Login = () => {
     setError('');
 
     try {
-      await login(identifier, password);
+      const loggedInUser = await login(identifier, password);
+      if (loggedInUser?.role) {
+        navigate(getPostLoginPath(loggedInUser.role), { replace: true });
+      }
     } catch (err) {
       setError(err.message || 'Login failed');
     } finally {

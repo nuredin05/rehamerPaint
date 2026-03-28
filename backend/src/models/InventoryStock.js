@@ -178,12 +178,7 @@ module.exports = (sequelize) => {
       as: 'warehouse'
     });
 
-    // InventoryStock has many Inventory Transactions
-    InventoryStock.hasMany(models.InventoryTransaction, {
-      foreignKey: ['productId', 'warehouseId'],
-      sourceKey: ['productId', 'warehouseId'],
-      as: 'transactions'
-    });
+    // Composite (productId + warehouseId) → Sequelize hasMany is unreliable here; query transactions by scope instead.
   };
 
   return InventoryStock;

@@ -190,17 +190,6 @@ module.exports = (sequelize) => {
   };
 
   // Class methods
-  User.findByEmailOrUsername = function(identifier) {
-    return this.findOne({
-      where: {
-        [this.sequelize.Sequelize.Op.or]: [
-          { email: identifier },
-          { username: identifier }
-        ]
-      }
-    });
-  };
-
   User.findActiveById = function(id) {
     return this.findOne({
       where: {
@@ -252,10 +241,12 @@ module.exports = (sequelize) => {
       as: 'createdSalesOrders'
     });
 
-    User.hasMany(models.ProductionOrder, {
-      foreignKey: 'createdBy',
-      as: 'createdProductionOrders'
-    });
+    if (models.ProductionOrder) {
+      User.hasMany(models.ProductionOrder, {
+        foreignKey: 'createdBy',
+        as: 'createdProductionOrders'
+      });
+    }
 
     User.hasMany(models.Transaction, {
       foreignKey: 'createdBy',
@@ -272,15 +263,19 @@ module.exports = (sequelize) => {
       as: 'createdDeliveryOrders'
     });
 
-    User.hasMany(models.QualityTest, {
-      foreignKey: 'testedBy',
-      as: 'qualityTests'
-    });
+    if (models.QualityTest) {
+      User.hasMany(models.QualityTest, {
+        foreignKey: 'testedBy',
+        as: 'qualityTests'
+      });
+    }
 
-    User.hasMany(models.ProductionBatch, {
-      foreignKey: 'createdBy',
-      as: 'createdProductionBatches'
-    });
+    if (models.ProductionBatch) {
+      User.hasMany(models.ProductionBatch, {
+        foreignKey: 'createdBy',
+        as: 'createdProductionBatches'
+      });
+    }
 
     User.hasMany(models.InventoryTransaction, {
       foreignKey: 'createdBy',

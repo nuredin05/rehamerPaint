@@ -243,11 +243,12 @@ module.exports = (sequelize) => {
       as: 'creator'
     });
 
-    // SalesOrder has many Sales Order Items
-    SalesOrder.hasMany(models.SalesOrderItem, {
-      foreignKey: 'salesOrderId',
-      as: 'items'
-    });
+    if (models.SalesOrderItem) {
+      SalesOrder.hasMany(models.SalesOrderItem, {
+        foreignKey: 'salesOrderId',
+        as: 'items'
+      });
+    }
 
     // SalesOrder has many Delivery Orders
     SalesOrder.hasMany(models.DeliveryOrder, {

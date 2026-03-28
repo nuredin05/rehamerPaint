@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('authToken');
     if (token) {
       // Validate token and set user
-      apiService.getProfile().then(response => {
-        setUser(response.user);
+      apiService.getProfile().then((profile) => {
+        setUser(profile);
       }).catch(() => {
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
@@ -35,30 +35,25 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (identifier, password) => {
     try {
-      console.log('🔐 Attempting login...', { identifier, password: '***' });
-      
       const response = await apiService.login({
         identifier,
         password
       });
 
-      console.log('✅ Login response:', response);
+      const userData = response?.user;
+      const token =
+        response?.tokens?.accessToken ||
+        response?.token ||
+        response?.accessToken;
 
-      // Handle different response formats
-      const userData = response.user || response.data?.user;
-      const token = response.token || response.data?.token || response.accessToken || response.data?.accessToken;
-      
       if (userData && token) {
         setUser(userData);
         localStorage.setItem('authToken', token);
         localStorage.setItem('user', JSON.stringify(userData));
-        
-        console.log('✅ User logged in successfully');
-      } else {
-        throw new Error('Invalid response from server');
+        return userData;
       }
+      throw new Error('Invalid response from server');
     } catch (error) {
-      console.error('❌ Login error:', error);
       throw new Error(error.message || 'Login failed');
     }
   };

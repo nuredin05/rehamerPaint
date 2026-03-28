@@ -1,8 +1,13 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate } = require('../middleware/auth.middleware');
+const { Product, InventoryStock, InventoryTransaction, User, Sequelize } = require('../models');
 
 const router = express.Router();
+const { Op } = Sequelize;
+
+router.use(authenticate);
 
 /**
  * @swagger
@@ -71,8 +76,55 @@ router.get('/products', [
   query('isActive').optional().isBoolean()
 ], async (req, res) => {
   try {
-    // TODO: Implement product listing logic
-    return ResponseHelper.success(res, [], 'Products retrieved successfully');
+    const where = { companyId: req.user.companyId };
+    if (req.query.categoryId) where.categoryId = parseInt(req.query.categoryId, 10);
+    if (req.query.productType) where.productType = req.query.productType;
+    if (req.query.isActive !== undefined && req.query.isActive !== '') {
+      where.isActive = req.query.isActive === 'true' || req.query.isActive === true;
+    }
+    if (req.query.search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${req.query.search}%` } },
+        { sku: { [Op.like]: `%${req.query.search}%` } },
+      ];
+    }
+
+    const products = await Product.findAll({
+      where,
+      include: [
+        {
+          model: InventoryStock,
+          as: 'inventoryStocks',
+          required: false,
+        },
+      ],
+      order: [['name', 'ASC']],
+    });
+
+    const data = products.map((p) => {
+      const j = p.toJSON();
+      const stock = (j.inventoryStocks || []).reduce(
+        (sum, row) => sum + parseFloat(row.quantity || 0),
+        0
+      );
+      const reorder = parseFloat(j.reorderLevel || 0);
+      let status = 'in-stock';
+      if (stock <= 0) status = 'out-of-stock';
+      else if (reorder > 0 && stock < reorder) status = 'low-stock';
+
+      return {
+        id: j.id,
+        name: j.name,
+        sku: j.sku,
+        stock,
+        price: parseFloat(j.sellingPrice || j.standardCost || 0),
+        status,
+        productType: j.productType,
+        isActive: j.isActive,
+      };
+    });
+
+    return ResponseHelper.success(res, data, 'Products retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve products');
   }
@@ -345,8 +397,61 @@ router.get('/transactions', [
   query('endDate').optional().isISO8601()
 ], async (req, res) => {
   try {
-    // TODO: Implement transaction listing logic
-    return ResponseHelper.success(res, [], 'Transactions retrieved successfully');
+    const where = {};
+    const productWhere = { companyId: req.user.companyId };
+    if (req.query.productId) where.productId = parseInt(req.query.productId, 10);
+    if (req.query.warehouseId) where.warehouseId = parseInt(req.query.warehouseId, 10);
+    if (req.query.transactionType) where.transactionType = req.query.transactionType;
+
+    const rows = await InventoryTransaction.findAll({
+      where,
+      include: [
+        {
+          model: Product,
+          as: 'product',
+          attributes: ['id', 'name', 'sku'],
+          where: productWhere,
+          required: true,
+        },
+        {
+          model: User,
+          as: 'creator',
+          attributes: ['id', 'firstName', 'lastName'],
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+      limit: Math.min(parseInt(req.query.limit, 10) || 100, 200),
+    });
+
+    const typeToUi = {
+      purchase: 'in',
+      sale: 'out',
+      production_in: 'in',
+      production_out: 'out',
+      transfer: 'out',
+      adjustment: 'in',
+      return: 'in',
+    };
+
+    const data = rows.map((t) => {
+      const j = t.toJSON();
+      const creator = j.creator;
+      const userLabel = creator
+        ? `${creator.firstName || ''} ${creator.lastName || ''}`.trim()
+        : '—';
+      return {
+        id: j.id,
+        type: typeToUi[j.transactionType] || 'out',
+        product: j.product?.name || '—',
+        quantity: parseFloat(j.quantity),
+        date: j.createdAt ? String(j.createdAt).slice(0, 10) : '',
+        user: userLabel,
+        transactionType: j.transactionType,
+      };
+    });
+
+    return ResponseHelper.success(res, data, 'Transactions retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve transactions');
   }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   Bell,
@@ -66,9 +67,10 @@ export const Navbar = () => {
                       Settings
                     </button>
                     <button
-                      onClick={() => {
-                        logout();
+                      onClick={async () => {
+                        await logout();
                         setDropdownOpen(false);
+                        navigate('/', { replace: true });
                       }}
                       className="flex items-center w-full text-left px-4 py-2 text-sm text-dangerClr hover:bg-secondaryClr"
                     >

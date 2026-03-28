@@ -1,8 +1,13 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate } = require('../middleware/auth.middleware');
+const { Customer, SalesOrder, Invoice, Sequelize } = require('../models');
 
 const router = express.Router();
+const { Op } = Sequelize;
+
+router.use(authenticate);
 
 /**
  * @swagger
@@ -58,8 +63,36 @@ router.get('/customers', [
   query('isActive').optional().isBoolean()
 ], async (req, res) => {
   try {
-    // TODO: Implement customer listing logic
-    return ResponseHelper.success(res, [], 'Customers retrieved successfully');
+    const where = { companyId: req.user.companyId };
+    if (req.query.isActive !== undefined && req.query.isActive !== '') {
+      where.isActive = req.query.isActive === 'true' || req.query.isActive === true;
+    }
+    if (req.query.search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${req.query.search}%` } },
+        { customerCode: { [Op.like]: `%${req.query.search}%` } },
+        { email: { [Op.like]: `%${req.query.search}%` } },
+      ];
+    }
+    const rows = await Customer.findAll({
+      where,
+      order: [['name', 'ASC']],
+      limit: Math.min(parseInt(req.query.limit, 10) || 100, 200),
+    });
+    const data = rows.map((c) => {
+      const j = c.toJSON();
+      return {
+        id: j.id,
+        name: j.name,
+        email: j.email || '',
+        phone: j.phone || '',
+        orders: 0,
+        totalSpent: 0,
+        status: j.isActive ? 'active' : 'inactive',
+        customerCode: j.customerCode,
+      };
+    });
+    return ResponseHelper.success(res, data, 'Customers retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve customers');
   }
@@ -211,8 +244,38 @@ router.get('/sales-orders', [
   query('endDate').optional().isISO8601()
 ], async (req, res) => {
   try {
-    // TODO: Implement sales order listing logic
-    return ResponseHelper.success(res, [], 'Sales orders retrieved successfully');
+    const where = { companyId: req.user.companyId };
+    if (req.query.customerId) where.customerId = parseInt(req.query.customerId, 10);
+    if (req.query.status) where.status = req.query.status;
+
+    const rows = await SalesOrder.findAll({
+      where,
+      include: [
+        {
+          model: Customer,
+          as: 'customer',
+          attributes: ['id', 'name'],
+        },
+      ],
+      order: [['orderDate', 'DESC']],
+      limit: Math.min(parseInt(req.query.limit, 10) || 100, 200),
+    });
+
+    const data = rows.map((o) => {
+      const j = o.toJSON();
+      return {
+        id: j.orderNumber || `SO-${j.id}`,
+        customer: j.customer?.name || '—',
+        product: '—',
+        quantity: 0,
+        amount: parseFloat(j.netAmount || j.totalAmount || 0),
+        date: j.orderDate,
+        status: j.status,
+        deliveryDate: j.deliveryDate,
+      };
+    });
+
+    return ResponseHelper.success(res, data, 'Sales orders retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve sales orders');
   }
@@ -419,8 +482,40 @@ router.get('/invoices', [
   query('endDate').optional().isISO8601()
 ], async (req, res) => {
   try {
-    // TODO: Implement invoice listing logic
-    return ResponseHelper.success(res, [], 'Invoices retrieved successfully');
+    const where = {
+      companyId: req.user.companyId,
+      invoiceType: 'sales',
+    };
+    if (req.query.customerId) where.customerId = parseInt(req.query.customerId, 10);
+    if (req.query.status) where.status = req.query.status;
+
+    const rows = await Invoice.findAll({
+      where,
+      include: [
+        {
+          model: Customer,
+          as: 'customer',
+          attributes: ['id', 'name'],
+          required: false,
+        },
+      ],
+      order: [['invoiceDate', 'DESC']],
+      limit: Math.min(parseInt(req.query.limit, 10) || 100, 200),
+    });
+
+    const data = rows.map((inv) => {
+      const j = inv.toJSON();
+      return {
+        id: j.invoiceNumber || `INV-${j.id}`,
+        customer: j.customer?.name || '—',
+        amount: parseFloat(j.totalAmount || 0),
+        date: j.invoiceDate,
+        status: j.status,
+        dueDate: j.dueDate,
+      };
+    });
+
+    return ResponseHelper.success(res, data, 'Invoices retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve invoices');
   }

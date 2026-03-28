@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import { useApiData, useCrudOperations, useNotification, useSearchFilter, useModal, useForm } from '../hooks/useApiData';
 import { 
   Users, 
@@ -25,10 +26,12 @@ import {
 
 export const Admin = () => {
   const [activeTab, setActiveTab] = useState('users');
+  const { user: authUser } = useAuth();
+  const [settingValueDraft, setSettingValueDraft] = useState('');
+  const [settingsSaving, setSettingsSaving] = useState(false);
   
   // Custom hooks
   const { showNotification, notification } = useNotification();
-  const { searchTerm, setSearchTerm, filteredData: filteredUsers } = useSearchFilter([], ['name', 'email', 'department']);
   const { isOpen: showUserModal, selectedItem: selectedUser, openModal: openUserModal, closeModal: closeUserModal } = useModal();
   const { isOpen: showViewModal, selectedItem: viewItem, openModal: openViewModal, closeModal: closeViewModal } = useModal();
   const { isOpen: showEditModal, selectedItem: editItem, openModal: openEditModal, closeModal: closeEditModal } = useModal();
@@ -38,6 +41,7 @@ export const Admin = () => {
   const newUserForm = useForm({
     name: '',
     email: '',
+    password: '',
     role: 'user',
     department: '',
     status: 'active'
@@ -62,10 +66,16 @@ export const Admin = () => {
     []
   );
 
-  const { data: systemSettings, loading: settingsLoading } = useApiData(
+  const { data: systemSettings, loading: settingsLoading, refetch: refetchSettings } = useApiData(
     () => apiService.getSettings(),
     []
   );
+
+  const { searchTerm, setSearchTerm, filteredData: filteredUsers } = useSearchFilter(users, [
+    'name',
+    'email',
+    'department',
+  ]);
 
   // CRUD operations
   const userCrud = useCrudOperations({
@@ -75,23 +85,17 @@ export const Admin = () => {
     updateStatus: apiService.toggleUserStatus
   });
 
-  // Update filtered users when users data changes
   useEffect(() => {
-    if (users.length > 0) {
-      filteredUsers.splice(0, filteredUsers.length, ...users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.department.toLowerCase().includes(searchTerm.toLowerCase())
-      ));
+    if (selectedSetting) {
+      setSettingValueDraft(String(selectedSetting.value ?? ''));
     }
-  }, [users, searchTerm]);
+  }, [selectedSetting]);
 
   // Handle add user
   const handleAddUser = async () => {
     const validationRules = {
       name: { required: true },
       email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-      department: { required: true }
     };
 
     if (!newUserForm.validate(validationRules)) {
@@ -99,7 +103,22 @@ export const Admin = () => {
       return;
     }
 
-    const result = await userCrud.create(newUserForm.values);
+    const pw = newUserForm.values.password?.trim();
+    if (pw && pw.length < 6) {
+      showNotification('Password must be at least 6 characters', 'error');
+      return;
+    }
+
+    const payload = {
+      name: newUserForm.values.name.trim(),
+      email: newUserForm.values.email.trim(),
+      role: newUserForm.values.role,
+      status: newUserForm.values.status,
+    };
+    if (pw) payload.password = pw;
+    if (authUser?.companyId != null) payload.companyId = authUser.companyId;
+
+    const result = await userCrud.create(payload);
     if (result.success) {
       showNotification('User added successfully', 'success');
       newUserForm.reset();
@@ -132,7 +151,6 @@ export const Admin = () => {
     const validationRules = {
       name: { required: true },
       email: { required: true, pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
-      department: { required: true }
     };
 
     if (!editUserForm.validate(validationRules)) {
@@ -140,7 +158,12 @@ export const Admin = () => {
       return;
     }
 
-    const result = await userCrud.update(editItem.id, editUserForm.values);
+    const result = await userCrud.update(editItem.id, {
+      name: editUserForm.values.name.trim(),
+      email: editUserForm.values.email.trim(),
+      role: editUserForm.values.role,
+      status: editUserForm.values.status,
+    });
     if (result.success) {
       showNotification('User updated successfully', 'success');
       closeEditModal();
@@ -206,14 +229,18 @@ export const Admin = () => {
 
   // Handle update setting
   const handleUpdateSetting = async () => {
-    if (!selectedSetting) return;
+    if (!selectedSetting?.id) return;
 
+    setSettingsSaving(true);
     try {
-      await apiService.updateSetting(selectedSetting.name, selectedSetting.value);
+      await apiService.updateSetting(selectedSetting.id, { settingValue: settingValueDraft });
       showNotification('Setting updated successfully', 'success');
       closeSettingModal();
+      refetchSettings();
     } catch (err) {
-      showNotification('Failed to update setting', 'error');
+      showNotification(err.message || 'Failed to update setting', 'error');
+    } finally {
+      setSettingsSaving(false);
     }
   };
 
