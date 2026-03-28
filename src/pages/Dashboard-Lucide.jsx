@@ -1,4 +1,16 @@
 import React from 'react';
+import {
+  Package,
+  DollarSign,
+  Users,
+  BarChart3,
+  Plus,
+  ShoppingCart,
+  ArrowDownLeft,
+  Activity,
+  TrendingUp,
+  TrendingDown
+} from 'lucide-react';
 
 export const Dashboard = () => {
   return (
@@ -13,7 +25,7 @@ export const Dashboard = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-primaryClrLight rounded-lg p-3">
-              <div className="text-2xl">📦</div>
+              <Package size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
@@ -27,7 +39,7 @@ export const Dashboard = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-accentClr rounded-lg p-3">
-              <div className="text-2xl">💰</div>
+              <DollarSign size={24} className="text-white" />
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
@@ -41,7 +53,7 @@ export const Dashboard = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-logoGold rounded-lg p-3">
-              <div className="text-2xl">👥</div>
+              <Users size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
@@ -55,7 +67,7 @@ export const Dashboard = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-dangerClr rounded-lg p-3">
-              <div className="text-2xl">📊</div>
+              <BarChart3 size={24} className="text-white" />
             </div>
             <div className="ml-5 w-0 flex-1">
               <dl>
@@ -75,17 +87,21 @@ export const Dashboard = () => {
           </div>
           <div className="p-6">
             <div className="space-y-3">
-              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200">
-                📦 Add New Product
+              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3">
+                <Package size={18} />
+                <span>Add New Product</span>
               </button>
-              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200">
-                🛒 Create Sales Order
+              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3">
+                <ShoppingCart size={18} />
+                <span>Create Sales Order</span>
               </button>
-              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200">
-                📦 Receive Inventory
+              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3">
+                <ArrowDownLeft size={18} />
+                <span>Receive Inventory</span>
               </button>
-              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200">
-                👥 Add Customer
+              <button className="w-full text-left bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-3">
+                <Users size={18} />
+                <span>Add Customer</span>
               </button>
             </div>
           </div>
@@ -125,3 +141,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+export default Dashboard;

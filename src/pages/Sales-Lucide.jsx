@@ -1,36 +1,62 @@
 import React, { useState } from 'react';
+import {
+  ShoppingCart,
+  Users,
+  DollarSign,
+  FileText,
+  Package,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  Lock,
+  Mail,
+  CreditCard,
+  RefreshCw,
+  Printer,
+  X,
+  Check,
+  AlertCircle,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Settings
+} from 'lucide-react';
 
 export const Sales = () => {
   const [activeTab, setActiveTab] = useState('orders');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [orders, setOrders] = useState([
-    { 
-      id: 'SO-001', 
-      customer: 'ABC Construction', 
-      product: 'Premium Paint - White', 
+    {
+      id: 'SO-001',
+      customer: 'ABC Construction',
+      product: 'Premium Paint - White',
       quantity: 100,
-      amount: 2500.00, 
+      amount: 2500.00,
       date: '2026-03-28',
       status: 'confirmed',
       deliveryDate: '2026-04-02'
     },
-    { 
-      id: 'SO-002', 
-      customer: 'XYZ Homes', 
-      product: 'Premium Paint - Blue', 
+    {
+      id: 'SO-002',
+      customer: 'XYZ Homes',
+      product: 'Premium Paint - Blue',
       quantity: 50,
-      amount: 1250.00, 
+      amount: 1250.00,
       date: '2026-03-28',
       status: 'pending',
       deliveryDate: '2026-04-05'
     },
-    { 
-      id: 'SO-003', 
-      customer: 'BuildRight Inc', 
-      product: 'Primer Coat', 
+    {
+      id: 'SO-003',
+      customer: 'BuildRight Inc',
+      product: 'Primer Coat',
       quantity: 200,
-      amount: 3000.00, 
+      amount: 3000.00,
       date: '2026-03-27',
       status: 'shipped',
       deliveryDate: '2026-03-30'
@@ -38,59 +64,59 @@ export const Sales = () => {
   ]);
 
   const [customers, setCustomers] = useState([
-    { 
-      id: 1, 
-      name: 'ABC Construction', 
-      email: 'contact@abc.com', 
-      phone: '+1234567890', 
-      orders: 15, 
+    {
+      id: 1,
+      name: 'ABC Construction',
+      email: 'contact@abc.com',
+      phone: '+1234567890',
+      orders: 15,
       totalSpent: 45200.00,
       status: 'active'
     },
-    { 
-      id: 2, 
-      name: 'XYZ Homes', 
-      email: 'info@xyzhomes.com', 
-      phone: '+1234567891', 
-      orders: 8, 
-      totalSpent: 22100.00,
+    {
+      id: 2,
+      name: 'XYZ Homes',
+      email: 'info@xyz.com',
+      phone: '+1234567891',
+      orders: 8,
+      totalSpent: 28900.00,
       status: 'active'
     },
-    { 
-      id: 3, 
-      name: 'BuildRight Inc', 
-      email: 'sales@buildright.com', 
-      phone: '+1234567892', 
-      orders: 12, 
-      totalSpent: 38400.00,
-      status: 'inactive'
+    {
+      id: 3,
+      name: 'BuildRight Inc',
+      email: 'orders@buildright.com',
+      phone: '+1234567892',
+      orders: 23,
+      totalSpent: 67800.00,
+      status: 'active'
     },
   ]);
 
   const [invoices, setInvoices] = useState([
-    { 
-      id: 'INV-001', 
-      customer: 'ABC Construction', 
-      amount: 2500.00, 
+    {
+      id: 'INV-001',
+      customer: 'ABC Construction',
+      amount: 2500.00,
       dueDate: '2026-04-15',
       status: 'paid',
       date: '2026-03-28'
     },
-    { 
-      id: 'INV-002', 
-      customer: 'XYZ Homes', 
-      amount: 1250.00, 
+    {
+      id: 'INV-002',
+      customer: 'XYZ Homes',
+      amount: 1250.00,
       dueDate: '2026-04-20',
       status: 'pending',
       date: '2026-03-28'
     },
-    { 
-      id: 'INV-003', 
-      customer: 'BuildRight Inc', 
-      amount: 3000.00, 
+    {
+      id: 'INV-003',
+      customer: 'BuildRight Inc',
+      amount: 3000.00,
       dueDate: '2026-04-10',
       status: 'overdue',
-      date: '2026-03-20'
+      date: '2026-03-27'
     },
   ]);
 
@@ -144,11 +170,24 @@ export const Sales = () => {
     const orderToAdd = {
       id: `SO-${String(orders.length + 1).padStart(3, '0')}`,
       ...newOrder,
+      quantity: parseInt(newOrder.quantity),
+      amount: parseFloat(newOrder.amount),
       date: new Date().toISOString().split('T')[0],
-      status: 'pending'
+      status: 'pending',
+      deliveryDate: newOrder.deliveryDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
     setOrders([...orders, orderToAdd]);
+
+    // Update customer stats
+    const customerIndex = customers.findIndex(c => c.name === newOrder.customer);
+    if (customerIndex >= 0) {
+      const updatedCustomers = [...customers];
+      updatedCustomers[customerIndex].orders += 1;
+      updatedCustomers[customerIndex].totalSpent += orderToAdd.amount;
+      setCustomers(updatedCustomers);
+    }
+
     setNewOrder({ customer: '', product: '', quantity: '', amount: '', deliveryDate: '' });
     setShowOrderModal(false);
     showNotification('Order added successfully', 'success');
@@ -165,7 +204,7 @@ export const Sales = () => {
       id: customers.length + 1,
       ...newCustomer,
       orders: 0,
-      totalSpent: 0
+      totalSpent: 0.00
     };
 
     setCustomers([...customers, customerToAdd]);
@@ -184,6 +223,7 @@ export const Sales = () => {
     const invoiceToAdd = {
       id: `INV-${String(invoices.length + 1).padStart(3, '0')}`,
       ...newInvoice,
+      amount: parseFloat(newInvoice.amount),
       date: new Date().toISOString().split('T')[0],
       status: 'pending'
     };
@@ -191,13 +231,13 @@ export const Sales = () => {
     setInvoices([...invoices, invoiceToAdd]);
     setNewInvoice({ customer: '', amount: '', dueDate: '' });
     setShowInvoiceModal(false);
-    showNotification('Invoice created successfully', 'success');
+    showNotification('Invoice added successfully', 'success');
   };
 
   // Update order status
   const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId 
+    setOrders(orders.map(order =>
+      order.id === orderId
         ? { ...order, status: newStatus }
         : order
     ));
@@ -206,8 +246,8 @@ export const Sales = () => {
 
   // Update invoice status
   const updateInvoiceStatus = (invoiceId, newStatus) => {
-    setInvoices(invoices.map(invoice => 
-      invoice.id === invoiceId 
+    setInvoices(invoices.map(invoice =>
+      invoice.id === invoiceId
         ? { ...invoice, status: newStatus }
         : invoice
     ));
@@ -237,8 +277,8 @@ export const Sales = () => {
   const getStatusBadge = (status) => {
     const styles = {
       'pending': 'bg-logoGold text-primaryClr',
-      'confirmed': 'bg-primaryClr text-primaryClrText',
-      'shipped': 'bg-accentClr text-white',
+      'confirmed': 'bg-accentClr text-white',
+      'shipped': 'bg-primaryClrLight text-primaryClr',
       'delivered': 'bg-accentClr text-white',
       'cancelled': 'bg-dangerClr text-white',
       'paid': 'bg-accentClr text-white',
@@ -252,6 +292,28 @@ export const Sales = () => {
       </span>
     );
   };
+
+  const getStatusIcon = (status) => {
+    const icons = {
+      'pending': Clock,
+      'confirmed': CheckCircle,
+      'shipped': Package,
+      'delivered': CheckCircle,
+      'cancelled': XCircle,
+      'paid': CheckCircle,
+      'overdue': AlertCircle,
+      'active': CheckCircle,
+      'inactive': XCircle
+    };
+    const IconComponent = icons[status] || Clock;
+    return <IconComponent size={12} className="mr-1" />;
+  };
+
+  // Calculate totals
+  const totalOrders = orders.length;
+  const totalCustomers = customers.length;
+  const totalRevenue = orders.reduce((sum, order) => sum + order.amount, 0);
+  const pendingInvoices = invoices.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + inv.amount, 0);
 
   const filteredOrders = orders.filter(order =>
     order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -273,15 +335,20 @@ export const Sales = () => {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-primaryClr">Sales Management</h1>
-        <p className="text-place">Manage customers, orders, and invoicing</p>
+        <p className="text-place">Manage orders, customers, and invoices</p>
       </div>
 
       {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 ${
           notification.type === 'success' ? 'bg-accentClr text-white' : 'bg-dangerClr text-white'
         }`}>
-          {notification.message}
+          {notification.type === 'success' ? (
+            <CheckCircle size={20} />
+          ) : (
+            <AlertCircle size={20} />
+          )}
+          <span>{notification.message}</span>
         </div>
       )}
 
@@ -290,44 +357,44 @@ export const Sales = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-primaryClrLight rounded-lg p-3">
-              <span className="text-2xl">📋</span>
+              <ShoppingCart size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Total Orders</p>
-              <p className="text-2xl font-bold text-primaryClr">{orders.length}</p>
+              <p className="text-2xl font-bold text-primaryClr">{totalOrders}</p>
             </div>
           </div>
         </div>
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-logoGold rounded-lg p-3">
-              <span className="text-2xl">👥</span>
+              <Users size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Customers</p>
-              <p className="text-2xl font-bold text-primaryClr">{customers.length}</p>
+              <p className="text-2xl font-bold text-primaryClr">{totalCustomers}</p>
             </div>
           </div>
         </div>
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-accentClr rounded-lg p-3">
-              <span className="text-2xl">💰</span>
+              <DollarSign size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Revenue</p>
-              <p className="text-2xl font-bold text-primaryClr">${orders.reduce((sum, order) => sum + order.amount, 0).toFixed(2)}</p>
+              <p className="text-2xl font-bold text-primaryClr">${totalRevenue.toFixed(2)}</p>
             </div>
           </div>
         </div>
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-dangerClr rounded-lg p-3">
-              <span className="text-2xl">🧾</span>
+              <FileText size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Pending Invoices</p>
-              <p className="text-2xl font-bold text-primaryClr">{invoices.filter(inv => inv.status === 'pending').length}</p>
+              <p className="text-2xl font-bold text-primaryClr">${pendingInvoices.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -339,33 +406,36 @@ export const Sales = () => {
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('orders')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'orders'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Sales Orders
+              <ShoppingCart size={16} />
+              <span>Orders</span>
             </button>
             <button
               onClick={() => setActiveTab('customers')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'customers'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Customers
+              <Users size={16} />
+              <span>Customers</span>
             </button>
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'invoices'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Invoices
+              <FileText size={16} />
+              <span>Invoices</span>
             </button>
           </nav>
         </div>
@@ -374,32 +444,37 @@ export const Sales = () => {
           {/* Search and Actions */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder={`Search ${activeTab}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
-              />
+              <div className="relative">
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-place" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
+                />
+              </div>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors">
-                📊 Reports
+              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                <TrendingUp size={16} />
+                <span>Sales Report</span>
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (activeTab === 'orders') setShowOrderModal(true);
                   else if (activeTab === 'customers') setShowCustomerModal(true);
                   else if (activeTab === 'invoices') setShowInvoiceModal(true);
                 }}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                ➕ New {activeTab.slice(0, -1)}
+                <Plus size={16} />
+                <span>New {activeTab.slice(0, -1)}</span>
               </button>
             </div>
           </div>
 
-          {/* Sales Orders Table */}
+          {/* Orders Table */}
           {activeTab === 'orders' && (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -410,8 +485,6 @@ export const Sales = () => {
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Product</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Quantity</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Amount</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Date</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Delivery</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Status</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Actions</th>
                   </tr>
@@ -423,34 +496,40 @@ export const Sales = () => {
                         <span className="font-medium text-primaryClr">{order.id}</span>
                       </td>
                       <td className="py-3 px-4 text-sm text-primaryClr">{order.customer}</td>
-                      <td className="py-3 px-4 text-sm text-primaryClr">{order.product}</td>
-                      <td className="py-3 px-4 text-sm text-place">{order.quantity}L</td>
+                      <td className="py-3 px-4 text-sm text-place">{order.product}</td>
+                      <td className="py-3 px-4 text-sm text-place">{order.quantity}</td>
                       <td className="py-3 px-4 text-sm font-medium text-primaryClr">${order.amount.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-sm text-place">{order.date}</td>
-                      <td className="py-3 px-4 text-sm text-place">{order.deliveryDate}</td>
-                      <td className="py-3 px-4">{getStatusBadge(order.status)}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center">
+                          {getStatusIcon(order.status)}
+                          {getStatusBadge(order.status)}
+                        </div>
+                      </td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('order', order)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Order"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button 
-                            onClick={() => updateOrderStatus(order.id, order.status === 'pending' ? 'confirmed' : order.status === 'confirmed' ? 'shipped' : 'delivered')}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Order">
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => updateOrderStatus(order.id, order.status === 'pending' ? 'confirmed' : 'pending')}
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Update Status"
                           >
-                            📦
+                            <RefreshCw size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('order', order.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Order"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -482,9 +561,7 @@ export const Sales = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-primaryClrLight flex items-center justify-center mr-3">
-                            <span className="text-primaryClrText text-sm font-medium">
-                              {customer.name.charAt(0)}
-                            </span>
+                            <Users size={16} className="text-primaryClrText" />
                           </div>
                           <span className="font-medium text-primaryClr">{customer.name}</span>
                         </div>
@@ -496,25 +573,25 @@ export const Sales = () => {
                       <td className="py-3 px-4">{getStatusBadge(customer.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('customer', customer)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Customer"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Customer">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Customer">
+                            <Edit size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Send Email">
-                            📧
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Send Email">
+                            <Mail size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('customer', customer.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Customer"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -534,7 +611,7 @@ export const Sales = () => {
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Invoice ID</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Customer</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Amount</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Issue Date</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Date</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Due Date</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Status</th>
                     <th className="text-left py-3 px-4 text-sm font-medium text-primaryClr">Actions</th>
@@ -553,32 +630,32 @@ export const Sales = () => {
                       <td className="py-3 px-4">{getStatusBadge(invoice.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('invoice', invoice)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Invoice"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Invoice">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Invoice">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => updateInvoiceStatus(invoice.id, invoice.status === 'pending' ? 'paid' : 'pending')}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Mark as Paid"
                           >
-                            💳
+                            <CreditCard size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Send Invoice">
-                            📧
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Print Invoice">
+                            <Printer size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('invoice', invoice.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Invoice"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -595,16 +672,31 @@ export const Sales = () => {
       {showOrderModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Order</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <ShoppingCart size={20} />
+                <span>Add New Order</span>
+              </h2>
+              <button
+                onClick={() => setShowOrderModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Customer *</label>
-                <input
-                  type="text"
+                <select
                   value={newOrder.customer}
                   onChange={(e) => setNewOrder({...newOrder, customer: e.target.value})}
                   className="w-full px-3 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr"
-                />
+                >
+                  <option value="">Select Customer</option>
+                  {customers.map(customer => (
+                    <option key={customer.id} value={customer.name}>{customer.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Product *</label>
@@ -616,7 +708,7 @@ export const Sales = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-primaryClr mb-1">Quantity (L) *</label>
+                <label className="block text-sm font-medium text-primaryClr mb-1">Quantity *</label>
                 <input
                   type="number"
                   value={newOrder.quantity}
@@ -646,15 +738,17 @@ export const Sales = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowOrderModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddOrder}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Order
+                <Check size={16} />
+                <span>Add Order</span>
               </button>
             </div>
           </div>
@@ -665,7 +759,18 @@ export const Sales = () => {
       {showCustomerModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Customer</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Users size={20} />
+                <span>Add New Customer</span>
+              </h2>
+              <button
+                onClick={() => setShowCustomerModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Name *</label>
@@ -698,15 +803,17 @@ export const Sales = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowCustomerModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddCustomer}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Customer
+                <Check size={16} />
+                <span>Add Customer</span>
               </button>
             </div>
           </div>
@@ -717,16 +824,31 @@ export const Sales = () => {
       {showInvoiceModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Create New Invoice</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <FileText size={20} />
+                <span>Create New Invoice</span>
+              </h2>
+              <button
+                onClick={() => setShowInvoiceModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Customer *</label>
-                <input
-                  type="text"
+                <select
                   value={newInvoice.customer}
                   onChange={(e) => setNewInvoice({...newInvoice, customer: e.target.value})}
                   className="w-full px-3 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr"
-                />
+                >
+                  <option value="">Select Customer</option>
+                  {customers.map(customer => (
+                    <option key={customer.id} value={customer.name}>{customer.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Amount ($) *</label>
@@ -750,15 +872,17 @@ export const Sales = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowInvoiceModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddInvoice}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Create Invoice
+                <Check size={16} />
+                <span>Create Invoice</span>
               </button>
             </div>
           </div>
@@ -769,23 +893,35 @@ export const Sales = () => {
       {showViewModal && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">
-              {selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Eye size={20} />
+                <span>{selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details</span>
+              </h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-3">
               {Object.entries(selectedItem.data).map(([key, value]) => (
                 <div key={key}>
                   <span className="text-sm text-place capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                  <p className="font-medium text-primaryClr">{value}</p>
+                  <p className="font-medium text-primaryClr">
+                    {typeof value === 'number' ? `$${value.toFixed(2)}` : value}
+                  </p>
                 </div>
               ))}
             </div>
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Close
+                <X size={16} />
+                <span>Close</span>
               </button>
             </div>
           </div>
@@ -794,3 +930,5 @@ export const Sales = () => {
     </div>
   );
 };
+
+export default Sales;

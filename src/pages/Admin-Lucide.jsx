@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../services/api';
 import { useApiData, useCrudOperations, useNotification, useSearchFilter, useModal, useForm } from '../hooks/useApiData';
+import { 
+  Users, 
+  Settings, 
+  CheckCircle, 
+  XCircle, 
+  Shield, 
+  Database, 
+  Wifi,
+  Plus,
+  Search,
+  Eye,
+  Edit,
+  Trash2,
+  Lock,
+  X,
+  Save,
+  AlertCircle,
+  HelpCircle,
+  FileText,
+  HardDrive
+} from 'lucide-react';
 
 export const Admin = () => {
   const [activeTab, setActiveTab] = useState('users');
@@ -234,7 +255,10 @@ export const Admin = () => {
   if (usersLoading || auditLoading || settingsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-primaryClr">Loading...</div>
+        <div className="flex items-center space-x-2 text-primaryClr">
+          <Settings className="animate-spin" size={24} />
+          <span>Loading...</span>
+        </div>
       </div>
     );
   }
@@ -243,7 +267,10 @@ export const Admin = () => {
   if (usersError) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-dangerClr">Error loading users: {usersError}</div>
+        <div className="flex items-center space-x-2 text-dangerClr">
+          <AlertCircle size={24} />
+          <span>Error loading users: {usersError}</span>
+        </div>
       </div>
     );
   }
@@ -257,10 +284,15 @@ export const Admin = () => {
 
       {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 ${
           notification.type === 'success' ? 'bg-accentClr text-white' : 'bg-dangerClr text-white'
         }`}>
-          {notification.message}
+          {notification.type === 'success' ? (
+            <CheckCircle size={20} />
+          ) : (
+            <AlertCircle size={20} />
+          )}
+          <span>{notification.message}</span>
         </div>
       )}
 
@@ -269,7 +301,7 @@ export const Admin = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-accentClr rounded-lg p-3">
-              <span className="text-2xl">👥</span>
+              <Users size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Total Users</p>
@@ -280,7 +312,7 @@ export const Admin = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-primaryClrLight rounded-lg p-3">
-              <span className="text-2xl">✅</span>
+              <CheckCircle size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">System Status</p>
@@ -291,7 +323,7 @@ export const Admin = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-logoGold rounded-lg p-3">
-              <span className="text-2xl">💾</span>
+              <Database size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Database</p>
@@ -302,7 +334,7 @@ export const Admin = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-dangerClr rounded-lg p-3">
-              <span className="text-2xl">📊</span>
+              <Wifi size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">API Status</p>
@@ -318,43 +350,47 @@ export const Admin = () => {
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('users')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'users'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              User Management
+              <Users size={16} />
+              <span>User Management</span>
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'settings'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              System Settings
+              <Settings size={16} />
+              <span>System Settings</span>
             </button>
             <button
               onClick={() => setActiveTab('audit')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'audit'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Audit Logs
+              <FileText size={16} />
+              <span>Audit Logs</span>
             </button>
             <button
               onClick={() => setActiveTab('backup')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'backup'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Backup & Restore
+              <HardDrive size={16} />
+              <span>Backup & Restore</span>
             </button>
           </nav>
         </div>
@@ -363,24 +399,29 @@ export const Admin = () => {
           {/* Search and Actions */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
-              />
+              <div className="relative">
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-place" />
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
+                />
+              </div>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors">
-                📊 System Report
+              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                <FileText size={16} />
+                <span>System Report</span>
               </button>
               <button 
                 onClick={() => openUserModal()}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 disabled:opacity-50"
                 disabled={userCrud.loading}
               >
-                {userCrud.loading ? '⏳ Adding...' : '➕ Add User'}
+                <Plus size={16} />
+                <span>{userCrud.loading ? 'Adding...' : 'Add User'}</span>
               </button>
             </div>
           </div>
@@ -406,9 +447,7 @@ export const Admin = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-primaryClrLight flex items-center justify-center mr-3">
-                            <span className="text-primaryClrText text-sm font-medium">
-                              {user.name.split(' ').map(n => n[0]).join('')}
-                            </span>
+                            <Users size={16} className="text-primaryClrText" />
                           </div>
                           <span className="font-medium text-primaryClr">{user.name}</span>
                         </div>
@@ -422,31 +461,31 @@ export const Admin = () => {
                         <div className="flex space-x-2">
                           <button 
                             onClick={() => openViewModal(user)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View User"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
                           <button 
                             onClick={() => openEditUserModal(user)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Edit User"
                           >
-                            ✏️
+                            <Edit size={16} />
                           </button>
                           <button 
                             onClick={() => handleToggleUserStatus(user.id)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Toggle Status"
                           >
-                            🔒
+                            <Lock size={16} />
                           </button>
                           <button 
                             onClick={() => handleDeleteUser(user.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete User"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -472,9 +511,10 @@ export const Admin = () => {
                         </div>
                         <button 
                           onClick={() => openSettingModalHandler(setting)}
-                          className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded transition-colors"
+                          className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px4 py-2 rounded transition-colors flex items-center space-x-2"
                         >
-                          Edit
+                          <Edit size={16} />
+                          <span>Edit</span>
                         </button>
                       </div>
                     ))}
@@ -517,21 +557,23 @@ export const Admin = () => {
           {/* Backup & Restore */}
           {activeTab === 'backup' && (
             <div className="text-center py-12">
-              <span className="text-4xl">💾</span>
+              <HardDrive size={48} className="mx-auto text-primaryClr mb-4" />
               <h3 className="mt-4 text-lg font-medium text-primaryClr">Backup & Restore</h3>
               <p className="mt-2 text-place">System backup and recovery management</p>
               <div className="flex justify-center space-x-3 mt-4">
                 <button 
                   onClick={() => showNotification('Backup initiated successfully', 'success')}
-                  className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-6 py-2 rounded-lg transition-colors"
+                  className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-6 py-2 rounded-lg transition-colors flex items-center space-x-2"
                 >
-                  💾 Create Backup
+                  <Database size={16} />
+                  <span>Create Backup</span>
                 </button>
                 <button 
                   onClick={() => showNotification('Restore feature coming soon', 'success')}
-                  className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-6 py-2 rounded-lg transition-colors"
+                  className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-6 py-2 rounded-lg transition-colors flex items-center space-x-2"
                 >
-                  📂 Restore Backup
+                  <HardDrive size={16} />
+                  <span>Restore Backup</span>
                 </button>
               </div>
             </div>
@@ -543,7 +585,18 @@ export const Admin = () => {
       {showUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New User</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Plus size={20} />
+                <span>Add New User</span>
+              </h2>
+              <button
+                onClick={closeUserModal}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Name *</label>
@@ -556,7 +609,10 @@ export const Admin = () => {
                   }`}
                 />
                 {newUserForm.errors.name && (
-                  <p className="text-dangerClr text-xs mt-1">{newUserForm.errors.name}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{newUserForm.errors.name}</span>
+                  </p>
                 )}
               </div>
               <div>
@@ -570,7 +626,10 @@ export const Admin = () => {
                   }`}
                 />
                 {newUserForm.errors.email && (
-                  <p className="text-dangerClr text-xs mt-1">{newUserForm.errors.email}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{newUserForm.errors.email}</span>
+                  </p>
                 )}
               </div>
               <div>
@@ -596,23 +655,32 @@ export const Admin = () => {
                   }`}
                 />
                 {newUserForm.errors.department && (
-                  <p className="text-dangerClr text-xs mt-1">{newUserForm.errors.department}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{newUserForm.errors.department}</span>
+                  </p>
                 )}
               </div>
             </div>
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={closeUserModal}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddUser}
                 disabled={userCrud.loading}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center space-x-2"
               >
-                {userCrud.loading ? 'Adding...' : 'Add User'}
+                {userCrud.loading ? (
+                  <Settings className="animate-spin" size={16} />
+                ) : (
+                  <Save size={16} />
+                )}
+                <span>{userCrud.loading ? 'Adding...' : 'Add User'}</span>
               </button>
             </div>
           </div>
@@ -623,7 +691,18 @@ export const Admin = () => {
       {showViewModal && viewItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">User Details</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Eye size={20} />
+                <span>User Details</span>
+              </h2>
+              <button
+                onClick={closeViewModal}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-3">
               <div>
                 <span className="text-sm text-place">Name:</span>
@@ -653,9 +732,10 @@ export const Admin = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={closeViewModal}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Close
+                <X size={16} />
+                <span>Close</span>
               </button>
             </div>
           </div>
@@ -666,7 +746,18 @@ export const Admin = () => {
       {showEditModal && editItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Edit User</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Edit size={20} />
+                <span>Edit User</span>
+              </h2>
+              <button
+                onClick={closeEditModal}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Name *</label>
@@ -679,7 +770,10 @@ export const Admin = () => {
                   }`}
                 />
                 {editUserForm.errors.name && (
-                  <p className="text-dangerClr text-xs mt-1">{editUserForm.errors.name}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{editUserForm.errors.name}</span>
+                  </p>
                 )}
               </div>
               <div>
@@ -693,7 +787,10 @@ export const Admin = () => {
                   }`}
                 />
                 {editUserForm.errors.email && (
-                  <p className="text-dangerClr text-xs mt-1">{editUserForm.errors.email}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{editUserForm.errors.email}</span>
+                  </p>
                 )}
               </div>
               <div>
@@ -719,7 +816,10 @@ export const Admin = () => {
                   }`}
                 />
                 {editUserForm.errors.department && (
-                  <p className="text-dangerClr text-xs mt-1">{editUserForm.errors.department}</p>
+                  <p className="text-dangerClr text-xs mt-1 flex items-center space-x-1">
+                    <AlertCircle size={12} />
+                    <span>{editUserForm.errors.department}</span>
+                  </p>
                 )}
               </div>
               <div>
@@ -734,19 +834,25 @@ export const Admin = () => {
                 </select>
               </div>
             </div>
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={closeEditModal}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-4"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleEditUser}
                 disabled={userCrud.loading}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors disabled:opacity-50 flex items-center space-x-4"
               >
-                {userCrud.loading ? 'Updating...' : 'Update User'}
+                {userCrud.loading ? (
+                  <Settings className="animate-spin" size={16} />
+                ) : (
+                  <Save size={16} />
+                )}
+                <span>{userCrud.loading ? 'Updating...' : 'Update User'}</span>
               </button>
             </div>
           </div>
@@ -757,11 +863,22 @@ export const Admin = () => {
       {showSettingModal && selectedSetting && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Edit Setting: {selectedSetting.name}</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-4">
+                <Settings size={20} />
+                <span>Edit Setting: {selectedSetting.name}</span>
+              </h2>
+              <button
+                onClick={closeSettingModal}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Current Value</label>
-                <p className="text-sm text-place mb-2">{selectedSetting.value}</p>
+                <p className="text-4- text-place mb-4-">{selectedSetting.value}</p>
                 <label className="block text-sm font-medium text-primaryClr mb-1">New Value</label>
                 <input
                   type="text"
@@ -771,18 +888,20 @@ export const Admin = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={closeSettingModal}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-4"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleUpdateSetting}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-4"
               >
-                Update Setting
+                <Save size={16} />
+                <span>Update Setting</span>
               </button>
             </div>
           </div>

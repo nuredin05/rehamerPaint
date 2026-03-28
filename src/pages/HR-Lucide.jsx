@@ -1,45 +1,78 @@
 import React, { useState } from 'react';
+import {
+  Users,
+  CheckCircle,
+  Calendar,
+  DollarSign,
+  Building,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  RefreshCw,
+  Printer,
+  X,
+  Check,
+  AlertCircle,
+  Briefcase,
+  GraduationCap,
+  Award,
+  Target,
+  Activity,
+  Clock,
+  UserCheck,
+  UserMinus,
+  FileText,
+  TrendingUp,
+  PieChart,
+  BarChart3,
+  Mail,
+  Phone,
+  MapPin,
+  Wallet
+} from 'lucide-react';
 
 export const HR = () => {
   const [activeTab, setActiveTab] = useState('employees');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [employees, setEmployees] = useState([
-    { 
-      id: 1, 
-      name: 'John Smith', 
-      email: 'john.smith@rehamerpaint.com', 
-      department: 'Manufacturing', 
+    {
+      id: 1,
+      name: 'John Smith',
+      email: 'john.smith@rehamerpaint.com',
+      department: 'Manufacturing',
       position: 'Production Manager',
       salary: 55000,
       hireDate: '2023-01-15',
       status: 'active'
     },
-    { 
-      id: 2, 
-      name: 'Sarah Johnson', 
-      email: 'sarah.johnson@rehamerpaint.com', 
-      department: 'Sales', 
+    {
+      id: 2,
+      name: 'Sarah Johnson',
+      email: 'sarah.johnson@rehamerpaint.com',
+      department: 'Sales',
       position: 'Sales Representative',
       salary: 42000,
       hireDate: '2023-03-20',
       status: 'active'
     },
-    { 
-      id: 3, 
-      name: 'Mike Chen', 
-      email: 'mike.chen@rehamerpaint.com', 
-      department: 'Finance', 
+    {
+      id: 3,
+      name: 'Mike Chen',
+      email: 'mike.chen@rehamerpaint.com',
+      department: 'Finance',
       position: 'Accountant',
       salary: 48000,
       hireDate: '2022-11-10',
       status: 'active'
     },
-    { 
-      id: 4, 
-      name: 'Emily Davis', 
-      email: 'emily.davis@rehamerpaint.com', 
-      department: 'HR', 
+    {
+      id: 4,
+      name: 'Emily Davis',
+      email: 'emily.davis@rehamerpaint.com',
+      department: 'HR',
       position: 'HR Specialist',
       salary: 45000,
       hireDate: '2024-02-01',
@@ -48,73 +81,73 @@ export const HR = () => {
   ]);
 
   const [departments, setDepartments] = useState([
-    { 
-      id: 1, 
-      name: 'Manufacturing', 
-      manager: 'John Smith', 
-      employees: 8, 
+    {
+      id: 1,
+      name: 'Manufacturing',
+      manager: 'John Smith',
+      employees: 8,
       budget: 450000,
       description: 'Production and quality control'
     },
-    { 
-      id: 2, 
-      name: 'Sales', 
-      manager: 'Sarah Johnson', 
-      employees: 4, 
+    {
+      id: 2,
+      name: 'Sales',
+      manager: 'Sarah Johnson',
+      employees: 4,
       budget: 120000,
       description: 'Customer relations and sales'
     },
-    { 
-      id: 3, 
-      name: 'Finance', 
-      manager: 'Mike Chen', 
-      employees: 3, 
+    {
+      id: 3,
+      name: 'Finance',
+      manager: 'Mike Chen',
+      employees: 3,
       budget: 180000,
       description: 'Financial management and accounting'
     },
-    { 
-      id: 4, 
-      name: 'HR', 
-      manager: 'Emily Davis', 
-      employees: 2, 
+    {
+      id: 4,
+      name: 'HR',
+      manager: 'Emily Davis',
+      employees: 2,
       budget: 95000,
       description: 'Human resources and administration'
     },
   ]);
 
   const [attendance, setAttendance] = useState([
-    { 
-      id: 1, 
-      employee: 'John Smith', 
-      date: '2026-03-28', 
-      checkIn: '08:30', 
+    {
+      id: 1,
+      employee: 'John Smith',
+      date: '2026-03-28',
+      checkIn: '08:30',
       checkOut: '17:45',
       status: 'present',
       department: 'Manufacturing'
     },
-    { 
-      id: 2, 
-      employee: 'Sarah Johnson', 
-      date: '2026-03-28', 
-      checkIn: '08:45', 
+    {
+      id: 2,
+      employee: 'Sarah Johnson',
+      date: '2026-03-28',
+      checkIn: '08:45',
       checkOut: '17:30',
       status: 'present',
       department: 'Sales'
     },
-    { 
-      id: 3, 
-      employee: 'Mike Chen', 
-      date: '2026-03-28', 
-      checkIn: '-', 
+    {
+      id: 3,
+      employee: 'Mike Chen',
+      date: '2026-03-28',
+      checkIn: '-',
       checkOut: '-',
       status: 'absent',
       department: 'Finance'
     },
-    { 
-      id: 4, 
-      employee: 'Emily Davis', 
-      date: '2026-03-28', 
-      checkIn: '09:15', 
+    {
+      id: 4,
+      employee: 'Emily Davis',
+      date: '2026-03-28',
+      checkIn: '09:15',
       checkOut: '17:00',
       status: 'late',
       department: 'HR'
@@ -122,43 +155,43 @@ export const HR = () => {
   ]);
 
   const [payroll, setPayroll] = useState([
-    { 
-      id: 1, 
-      employee: 'John Smith', 
-      month: 'March 2026', 
-      basicSalary: 55000, 
-      allowance: 5000, 
-      deduction: 5500, 
+    {
+      id: 1,
+      employee: 'John Smith',
+      month: 'March 2026',
+      basicSalary: 55000,
+      allowance: 5000,
+      deduction: 5500,
       netSalary: 54500,
       status: 'paid'
     },
-    { 
-      id: 2, 
-      employee: 'Sarah Johnson', 
-      month: 'March 2026', 
-      basicSalary: 42000, 
-      allowance: 3000, 
-      deduction: 4200, 
+    {
+      id: 2,
+      employee: 'Sarah Johnson',
+      month: 'March 2026',
+      basicSalary: 42000,
+      allowance: 3000,
+      deduction: 4200,
       netSalary: 40800,
       status: 'paid'
     },
-    { 
-      id: 3, 
-      employee: 'Mike Chen', 
-      month: 'March 2026', 
-      basicSalary: 48000, 
-      allowance: 4000, 
-      deduction: 4800, 
+    {
+      id: 3,
+      employee: 'Mike Chen',
+      month: 'March 2026',
+      basicSalary: 48000,
+      allowance: 4000,
+      deduction: 4800,
       netSalary: 47200,
       status: 'pending'
     },
-    { 
-      id: 4, 
-      employee: 'Emily Davis', 
-      month: 'March 2026', 
-      basicSalary: 45000, 
-      allowance: 3500, 
-      deduction: 4500, 
+    {
+      id: 4,
+      employee: 'Emily Davis',
+      month: 'March 2026',
+      basicSalary: 45000,
+      allowance: 3500,
+      deduction: 4500,
       netSalary: 44000,
       status: 'pending'
     },
@@ -214,12 +247,12 @@ export const HR = () => {
     };
 
     setEmployees([...employees, employeeToAdd]);
-    
+
     // Update department employee count
     const dept = departments.find(d => d.name === newEmployee.department);
     if (dept) {
-      setDepartments(departments.map(d => 
-        d.name === newEmployee.department 
+      setDepartments(departments.map(d =>
+        d.name === newEmployee.department
           ? { ...d, employees: d.employees + 1 }
           : d
       ));
@@ -265,8 +298,8 @@ export const HR = () => {
 
   // Update employee status
   const updateEmployeeStatus = (employeeId, newStatus) => {
-    setEmployees(employees.map(employee => 
-      employee.id === employeeId 
+    setEmployees(employees.map(employee =>
+      employee.id === employeeId
         ? { ...employee, status: newStatus }
         : employee
     ));
@@ -275,8 +308,8 @@ export const HR = () => {
 
   // Update payroll status
   const updatePayrollStatus = (payrollId, newStatus) => {
-    setPayroll(payroll.map(item => 
-      item.id === payrollId 
+    setPayroll(payroll.map(item =>
+      item.id === payrollId
         ? { ...item, status: newStatus }
         : item
     ));
@@ -289,12 +322,12 @@ export const HR = () => {
       if (type === 'employee') {
         const employee = employees.find(e => e.id === id);
         setEmployees(employees.filter(employee => employee.id !== id));
-        
+
         // Update department employee count
         const dept = departments.find(d => d.name === employee.department);
         if (dept) {
-          setDepartments(departments.map(d => 
-            d.name === employee.department 
+          setDepartments(departments.map(d =>
+            d.name === employee.department
               ? { ...d, employees: d.employees - 1 }
               : d
           ));
@@ -368,10 +401,15 @@ export const HR = () => {
 
       {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 ${
           notification.type === 'success' ? 'bg-accentClr text-white' : 'bg-dangerClr text-white'
         }`}>
-          {notification.message}
+          {notification.type === 'success' ? (
+            <CheckCircle size={20} />
+          ) : (
+            <AlertCircle size={20} />
+          )}
+          <span>{notification.message}</span>
         </div>
       )}
 
@@ -380,7 +418,7 @@ export const HR = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-primaryClrLight rounded-lg p-3">
-              <span className="text-2xl">👥</span>
+              <Users size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Total Employees</p>
@@ -391,7 +429,7 @@ export const HR = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-accentClr rounded-lg p-3">
-              <span className="text-2xl">✅</span>
+              <UserCheck size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Active Employees</p>
@@ -402,7 +440,7 @@ export const HR = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-logoGold rounded-lg p-3">
-              <span className="text-2xl">📅</span>
+              <Calendar size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Present Today</p>
@@ -413,7 +451,7 @@ export const HR = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-dangerClr rounded-lg p-3">
-              <span className="text-2xl">💰</span>
+              <DollarSign size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Monthly Payroll</p>
@@ -429,43 +467,47 @@ export const HR = () => {
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('employees')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'employees'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Employees
+              <Users size={16} />
+              <span>Employees</span>
             </button>
             <button
               onClick={() => setActiveTab('departments')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'departments'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Departments
+              <Building size={16} />
+              <span>Departments</span>
             </button>
             <button
               onClick={() => setActiveTab('attendance')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'attendance'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Attendance
+              <Calendar size={16} />
+              <span>Attendance</span>
             </button>
             <button
               onClick={() => setActiveTab('payroll')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'payroll'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Payroll
+              <DollarSign size={16} />
+              <span>Payroll</span>
             </button>
           </nav>
         </div>
@@ -474,26 +516,31 @@ export const HR = () => {
           {/* Search and Actions */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder={`Search ${activeTab}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
-              />
+              <div className="relative">
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-place" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
+                />
+              </div>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors">
-                📊 HR Reports
+              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                <BarChart3 size={16} />
+                <span>HR Reports</span>
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (activeTab === 'employees') setShowEmployeeModal(true);
                   else if (activeTab === 'departments') setShowDepartmentModal(true);
                 }}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                ➕ Add {activeTab.slice(0, -1)}
+                <Plus size={16} />
+                <span>Add {activeTab.slice(0, -1)}</span>
               </button>
             </div>
           </div>
@@ -519,9 +566,7 @@ export const HR = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-primaryClrLight flex items-center justify-center mr-3">
-                            <span className="text-primaryClrText text-sm font-medium">
-                              {employee.name.split(' ').map(n => n[0]).join('')}
-                            </span>
+                            <Users size={16} className="text-primaryClrText" />
                           </div>
                           <div>
                             <span className="font-medium text-primaryClr">{employee.name}</span>
@@ -536,29 +581,29 @@ export const HR = () => {
                       <td className="py-3 px-4">{getStatusBadge(employee.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('employee', employee)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Employee"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Employee">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Employee">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => updateEmployeeStatus(employee.id, employee.status === 'active' ? 'on-leave' : 'active')}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Toggle Status"
                           >
-                            🔄
+                            <RefreshCw size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('employee', employee.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Employee"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -589,9 +634,7 @@ export const HR = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-primaryClrLight flex items-center justify-center mr-3">
-                            <span className="text-primaryClrText text-sm font-medium">
-                              {department.name.charAt(0)}
-                            </span>
+                            <Building size={16} className="text-primaryClrText" />
                           </div>
                           <span className="font-medium text-primaryClr">{department.name}</span>
                         </div>
@@ -602,22 +645,22 @@ export const HR = () => {
                       <td className="py-3 px-4 text-sm text-place">{department.description}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('department', department)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Department"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Department">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Department">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('department', department.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Department"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -654,22 +697,22 @@ export const HR = () => {
                       <td className="py-3 px-4">{getStatusBadge(record.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('attendance', record)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Record"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Record">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Record">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('attendance', record.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Record"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -708,25 +751,25 @@ export const HR = () => {
                       <td className="py-3 px-4">{getStatusBadge(record.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('payroll', record)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Payroll"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Payroll">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Payroll">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => updatePayrollStatus(record.id, record.status === 'pending' ? 'paid' : 'pending')}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Mark as Paid"
                           >
-                            💳
+                            <CreditCard size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Print Payslip">
-                            🖨️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Print Payslip">
+                            <Printer size={16} />
                           </button>
                         </div>
                       </td>
@@ -743,7 +786,18 @@ export const HR = () => {
       {showEmployeeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Employee</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Users size={20} />
+                <span>Add New Employee</span>
+              </h2>
+              <button
+                onClick={() => setShowEmployeeModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Name *</label>
@@ -807,15 +861,17 @@ export const HR = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowEmployeeModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddEmployee}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Employee
+                <Check size={16} />
+                <span>Add Employee</span>
               </button>
             </div>
           </div>
@@ -826,7 +882,18 @@ export const HR = () => {
       {showDepartmentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Department</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Building size={20} />
+                <span>Add New Department</span>
+              </h2>
+              <button
+                onClick={() => setShowDepartmentModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Department Name *</label>
@@ -868,15 +935,17 @@ export const HR = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowDepartmentModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddDepartment}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Department
+                <Check size={16} />
+                <span>Add Department</span>
               </button>
             </div>
           </div>
@@ -887,16 +956,25 @@ export const HR = () => {
       {showViewModal && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">
-              {selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Eye size={20} />
+                <span>{selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details</span>
+              </h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-3">
               {Object.entries(selectedItem.data).map(([key, value]) => (
                 <div key={key}>
                   <span className="text-sm text-place capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
                   <p className="font-medium text-primaryClr">
-                    {typeof value === 'number' && key.includes('Salary') || key.includes('Budget') || key.includes('Net') || key.includes('Basic') || key.includes('Allowance') || key.includes('Deduction') 
-                      ? `$${value.toLocaleString()}` 
+                    {typeof value === 'number' && key.includes('Salary') || key.includes('Budget') || key.includes('Net') || key.includes('Basic') || key.includes('Allowance') || key.includes('Deduction')
+                      ? `$${value.toLocaleString()}`
                       : value}
                   </p>
                 </div>
@@ -905,9 +983,10 @@ export const HR = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Close
+                <X size={16} />
+                <span>Close</span>
               </button>
             </div>
           </div>
@@ -916,3 +995,5 @@ export const HR = () => {
     </div>
   );
 };
+
+export default HR;

@@ -1,6 +1,6 @@
 // API Service for connecting to backend database
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Update this to your backend URL
+const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your backend URL
 
 class ApiService {
   // Generic request method
@@ -25,7 +25,8 @@ class ApiService {
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
       
       return await response.json();
@@ -36,8 +37,10 @@ class ApiService {
   }
 
   // GET请求
-  async get(endpoint) {
-    return this.request(endpoint);
+  async get(endpoint, params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+    return this.request(url);
   }
 
   // POST请求
@@ -66,8 +69,8 @@ class ApiService {
   // ==================== ADMIN MODULE ====================
   
   // User Management
-  async getUsers() {
-    return this.get('/admin/users');
+  async getUsers(params = {}) {
+    return this.get('/admin/users', params);
   }
 
   async createUser(userData) {
@@ -91,28 +94,37 @@ class ApiService {
     return this.get('/admin/settings');
   }
 
-  async updateSetting(settingName, value) {
-    return this.put('/admin/settings', { name: settingName, value });
+  async updateSetting(settingId, settingData) {
+    return this.put(`/admin/settings/${settingId}`, settingData);
   }
 
   // Audit Logs
-  async getAuditLogs() {
-    return this.get('/admin/audit-logs');
+  async getAuditLogs(params = {}) {
+    return this.get('/admin/audit-logs', params);
   }
 
   async addAuditLog(logData) {
     return this.post('/admin/audit-logs', logData);
   }
 
+  // System Statistics
+  async getSystemStats() {
+    return this.get('/admin/stats');
+  }
+
   // ==================== SALES MODULE ====================
   
   // Orders
-  async getOrders() {
-    return this.get('/sales/orders');
+  async getOrders(params = {}) {
+    return this.get('/sales/orders', params);
   }
 
   async createOrder(orderData) {
     return this.post('/sales/orders', orderData);
+  }
+
+  async updateOrder(orderId, orderData) {
+    return this.put(`/sales/orders/${orderId}`, orderData);
   }
 
   async updateOrderStatus(orderId, status) {
@@ -124,8 +136,8 @@ class ApiService {
   }
 
   // Customers
-  async getCustomers() {
-    return this.get('/sales/customers');
+  async getCustomers(params = {}) {
+    return this.get('/sales/customers', params);
   }
 
   async createCustomer(customerData) {
@@ -141,12 +153,16 @@ class ApiService {
   }
 
   // Invoices
-  async getInvoices() {
-    return this.get('/sales/invoices');
+  async getInvoices(params = {}) {
+    return this.get('/sales/invoices', params);
   }
 
   async createInvoice(invoiceData) {
     return this.post('/sales/invoices', invoiceData);
+  }
+
+  async updateInvoice(invoiceId, invoiceData) {
+    return this.put(`/sales/invoices/${invoiceId}`, invoiceData);
   }
 
   async updateInvoiceStatus(invoiceId, status) {
@@ -157,15 +173,24 @@ class ApiService {
     return this.delete(`/sales/invoices/${invoiceId}`);
   }
 
+  // Sales Analytics
+  async getSalesAnalytics(params = {}) {
+    return this.get('/sales/analytics', params);
+  }
+
   // ==================== FINANCE MODULE ====================
   
   // Transactions
-  async getTransactions() {
-    return this.get('/finance/transactions');
+  async getTransactions(params = {}) {
+    return this.get('/finance/transactions', params);
   }
 
   async createTransaction(transactionData) {
     return this.post('/finance/transactions', transactionData);
+  }
+
+  async updateTransaction(transactionId, transactionData) {
+    return this.put(`/finance/transactions/${transactionId}`, transactionData);
   }
 
   async updateTransactionStatus(transactionId, status) {
@@ -177,8 +202,8 @@ class ApiService {
   }
 
   // Accounts
-  async getAccounts() {
-    return this.get('/finance/accounts');
+  async getAccounts(params = {}) {
+    return this.get('/finance/accounts', params);
   }
 
   async createAccount(accountData) {
@@ -194,15 +219,20 @@ class ApiService {
   }
 
   // Finance Invoices
-  async getFinanceInvoices() {
-    return this.get('/finance/invoices');
+  async getFinanceInvoices(params = {}) {
+    return this.get('/finance/invoices', params);
+  }
+
+  // Financial Reports
+  async getFinancialReports(params = {}) {
+    return this.get('/finance/reports', params);
   }
 
   // ==================== HR MODULE ====================
   
   // Employees
-  async getEmployees() {
-    return this.get('/hr/employees');
+  async getEmployees(params = {}) {
+    return this.get('/hr/employees', params);
   }
 
   async createEmployee(employeeData) {
@@ -222,8 +252,8 @@ class ApiService {
   }
 
   // Departments
-  async getDepartments() {
-    return this.get('/hr/departments');
+  async getDepartments(params = {}) {
+    return this.get('/hr/departments', params);
   }
 
   async createDepartment(departmentData) {
@@ -239,8 +269,8 @@ class ApiService {
   }
 
   // Attendance
-  async getAttendance() {
-    return this.get('/hr/attendance');
+  async getAttendance(params = {}) {
+    return this.get('/hr/attendance', params);
   }
 
   async createAttendance(attendanceData) {
@@ -256,26 +286,51 @@ class ApiService {
   }
 
   // Payroll
-  async getPayroll() {
-    return this.get('/hr/payroll');
+  async getPayroll(params = {}) {
+    return this.get('/hr/payroll', params);
   }
 
   async createPayroll(payrollData) {
     return this.post('/hr/payroll', payrollData);
   }
 
+  async updatePayroll(payrollId, payrollData) {
+    return this.put(`/hr/payroll/${payrollId}`, payrollData);
+  }
+
   async updatePayrollStatus(payrollId, status) {
     return this.put(`/hr/payroll/${payrollId}/status`, { status });
   }
 
-  // ==================== INVENTORY MODULE ====================
-  
-  async getProducts() {
-    return this.get('/inventory/products');
+  async deletePayroll(payrollId) {
+    return this.delete(`/hr/payroll/${payrollId}`);
   }
 
-  async getInventoryTransactions() {
-    return this.get('/inventory/transactions');
+  // HR Analytics
+  async getHRAnalytics(params = {}) {
+    return this.get('/hr/analytics', params);
+  }
+
+  // ==================== INVENTORY MODULE ====================
+  
+  async getProducts(params = {}) {
+    return this.get('/inventory/products', params);
+  }
+
+  async createProduct(productData) {
+    return this.post('/inventory/products', productData);
+  }
+
+  async updateProduct(productId, productData) {
+    return this.put(`/inventory/products/${productId}`, productData);
+  }
+
+  async deleteProduct(productId) {
+    return this.delete(`/inventory/products/${productId}`);
+  }
+
+  async getInventoryTransactions(params = {}) {
+    return this.get('/inventory/transactions', params);
   }
 
   async createInventoryTransaction(transactionData) {
@@ -284,66 +339,231 @@ class ApiService {
 
   // ==================== PROCUREMENT MODULE ====================
   
-  async getPurchaseOrders() {
-    return this.get('/procurement/purchase-orders');
+  async getPurchaseOrders(params = {}) {
+    return this.get('/procurement/purchase-orders', params);
   }
 
   async createPurchaseOrder(orderData) {
     return this.post('/procurement/purchase-orders', orderData);
   }
 
-  async getSuppliers() {
-    return this.get('/procurement/suppliers');
+  async updatePurchaseOrder(orderId, orderData) {
+    return this.put(`/procurement/purchase-orders/${orderId}`, orderData);
+  }
+
+  async deletePurchaseOrder(orderId) {
+    return this.delete(`/procurement/purchase-orders/${orderId}`);
+  }
+
+  async getSuppliers(params = {}) {
+    return this.get('/procurement/suppliers', params);
   }
 
   async createSupplier(supplierData) {
     return this.post('/procurement/suppliers', supplierData);
   }
 
+  async updateSupplier(supplierId, supplierData) {
+    return this.put(`/procurement/suppliers/${supplierId}`, supplierData);
+  }
+
+  async deleteSupplier(supplierId) {
+    return this.delete(`/procurement/suppliers/${supplierId}`);
+  }
+
   // ==================== MANUFACTURING MODULE ====================
   
-  async getProductionOrders() {
-    return this.get('/manufacturing/production-orders');
+  async getProductionOrders(params = {}) {
+    return this.get('/manufacturing/production-orders', params);
   }
 
   async createProductionOrder(orderData) {
     return this.post('/manufacturing/production-orders', orderData);
   }
 
-  async getBillOfMaterials() {
-    return this.get('/manufacturing/bill-of-materials');
+  async updateProductionOrder(orderId, orderData) {
+    return this.put(`/manufacturing/production-orders/${orderId}`, orderData);
   }
 
-  async getQualityChecks() {
-    return this.get('/manufacturing/quality-checks');
+  async deleteProductionOrder(orderId) {
+    return this.delete(`/manufacturing/production-orders/${orderId}`);
+  }
+
+  async getBillOfMaterials(params = {}) {
+    return this.get('/manufacturing/bill-of-materials', params);
+  }
+
+  async createBillOfMaterials(bomData) {
+    return this.post('/manufacturing/bill-of-materials', bomData);
+  }
+
+  async getQualityChecks(params = {}) {
+    return this.get('/manufacturing/quality-checks', params);
+  }
+
+  async createQualityCheck(checkData) {
+    return this.post('/manufacturing/quality-checks', checkData);
   }
 
   // ==================== LOGISTICS MODULE ====================
   
-  async getDeliveries() {
-    return this.get('/logistics/deliveries');
+  async getDeliveries(params = {}) {
+    return this.get('/logistics/deliveries', params);
   }
 
   async createDelivery(deliveryData) {
     return this.post('/logistics/deliveries', deliveryData);
   }
 
-  async getVehicles() {
-    return this.get('/logistics/vehicles');
+  async updateDelivery(deliveryId, deliveryData) {
+    return this.put(`/logistics/deliveries/${deliveryId}`, deliveryData);
   }
 
-  async getDrivers() {
-    return this.get('/logistics/drivers');
+  async deleteDelivery(deliveryId) {
+    return this.delete(`/logistics/deliveries/${deliveryId}`);
+  }
+
+  async getVehicles(params = {}) {
+    return this.get('/logistics/vehicles', params);
+  }
+
+  async createVehicle(vehicleData) {
+    return this.post('/logistics/vehicles', vehicleData);
+  }
+
+  async updateVehicle(vehicleId, vehicleData) {
+    return this.put(`/logistics/vehicles/${vehicleId}`, vehicleData);
+  }
+
+  async deleteVehicle(vehicleId) {
+    return this.delete(`/logistics/vehicles/${vehicleId}`);
+  }
+
+  async getDrivers(params = {}) {
+    return this.get('/logistics/drivers', params);
+  }
+
+  async createDriver(driverData) {
+    return this.post('/logistics/drivers', driverData);
+  }
+
+  async updateDriver(driverId, driverData) {
+    return this.put(`/logistics/drivers/${driverId}`, driverData);
+  }
+
+  async deleteDriver(driverId) {
+    return this.delete(`/logistics/drivers/${driverId}`);
   }
 
   // ==================== REPORTS MODULE ====================
   
-  async getReportData(reportType) {
-    return this.get(`/reports/${reportType}`);
+  async getReportData(reportType, params = {}) {
+    return this.get(`/reports/${reportType}`, params);
   }
 
   async generateReport(reportConfig) {
     return this.post('/reports/generate', reportConfig);
+  }
+
+  async getSavedReports(params = {}) {
+    return this.get('/reports/saved', params);
+  }
+
+  async saveReport(reportData) {
+    return this.post('/reports/saved', reportData);
+  }
+
+  // ==================== AUTHENTICATION ====================
+  
+  async login(credentials) {
+    return this.post('/auth/login', credentials);
+  }
+
+  async logout() {
+    return this.post('/auth/logout');
+  }
+
+  async refreshToken() {
+    return this.post('/auth/refresh');
+  }
+
+  async getProfile() {
+    return this.get('/auth/profile');
+  }
+
+  async updateProfile(profileData) {
+    return this.put('/auth/profile', profileData);
+  }
+
+  async changePassword(passwordData) {
+    return this.post('/auth/change-password', passwordData);
+  }
+
+  // ==================== UTILITY METHODS ====================
+  
+  // Health check
+  async healthCheck() {
+    return this.get('/health');
+  }
+
+  // Get API documentation
+  async getApiDocs() {
+    return this.get('/api-docs');
+  }
+
+  // Upload file (for features like import/export)
+  async uploadFile(endpoint, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      Authorization: token ? `Bearer ${token}` : '',
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        body: formData,
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('File upload failed:', error);
+      throw error;
+    }
+  }
+
+  // Export data
+  async exportData(endpoint, params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+    
+    const token = localStorage.getItem('authToken');
+    const headers = {
+      Authorization: token ? `Bearer ${token}` : '',
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${url}`, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Export failed: ${response.statusText}`);
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.error('Data export failed:', error);
+      throw error;
+    }
   }
 }
 

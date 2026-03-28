@@ -1,18 +1,18 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Sidebar } from './components/layout/Sidebar';
-import { Navbar } from './components/layout/Navbar';
-import { Dashboard } from './pages/Dashboard';
-import { Login } from './pages/Login';
-import { Inventory } from './pages/Inventory';
-import { Sales } from './pages/Sales-Functional';
-import { Procurement } from './pages/Procurement-Clean';
-import { Manufacturing } from './pages/Manufacturing-Fixed';
-import { Finance } from './pages/Finance-Functional';
-import { HR } from './pages/HR-Functional';
-import { Logistics } from './pages/Logistics-Fixed';
-import { Reports } from './pages/Reports';
-import { Admin } from './pages/Admin-DB';
+import { Sidebar } from './components/layout/Sidebar-Lucide';
+import { Navbar } from './components/layout/Navbar-Lucide';
+import { Dashboard } from './pages/Dashboard-Lucide';
+import { Login } from './pages/Login-Lucide';
+import { Inventory } from './pages/Inventory-Lucide';
+import { Sales } from './pages/Sales-Lucide';
+import { Procurement } from './pages/Procurement-Lucide';
+import { Manufacturing } from './pages/Manufacturing-Lucide';
+import { Finance } from './pages/Finance-Lucide';
+import { HR } from './pages/HR-Lucide';
+import { Logistics } from './pages/Logistics-Lucide';
+import { Reports } from './pages/Reports-Lucide';
+import { Admin } from './pages/Admin-Lucide';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {

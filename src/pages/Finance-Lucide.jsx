@@ -1,96 +1,126 @@
 import React, { useState } from 'react';
+import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  FileText,
+  Wallet,
+  Building,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  CreditCard,
+  RefreshCw,
+  Printer,
+  X,
+  Check,
+  AlertCircle,
+  BarChart3,
+  PieChart,
+  LineChart,
+  ArrowUp,
+  ArrowDown,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertTriangle,
+  Settings,
+  Download
+} from 'lucide-react';
 
 export const Finance = () => {
   const [activeTab, setActiveTab] = useState('transactions');
   const [searchTerm, setSearchTerm] = useState('');
 
   const [transactions, setTransactions] = useState([
-    { 
-      id: 'TRX-001', 
-      type: 'income', 
-      category: 'Sales Revenue', 
-      description: 'Payment from ABC Construction', 
-      amount: 1250.00, 
+    {
+      id: 'TRX-001',
+      type: 'income',
+      category: 'Sales Revenue',
+      description: 'Payment from ABC Construction',
+      amount: 1250.00,
       date: '2026-03-28',
       status: 'completed'
     },
-    { 
-      id: 'TRX-002', 
-      type: 'expense', 
-      category: 'Materials', 
-      description: 'Payment to ChemCo Supplies', 
-      amount: -3500.00, 
+    {
+      id: 'TRX-002',
+      type: 'expense',
+      category: 'Materials',
+      description: 'Payment to ChemCo Supplies',
+      amount: -3500.00,
       date: '2026-03-28',
       status: 'completed'
     },
-    { 
-      id: 'TRX-003', 
-      type: 'income', 
-      category: 'Sales Revenue', 
-      description: 'Payment from XYZ Homes', 
-      amount: 890.50, 
+    {
+      id: 'TRX-003',
+      type: 'income',
+      category: 'Sales Revenue',
+      description: 'Payment from XYZ Homes',
+      amount: 890.50,
       date: '2026-03-27',
       status: 'completed'
     },
-    { 
-      id: 'TRX-004', 
-      type: 'expense', 
-      category: 'Utilities', 
-      description: 'Electricity Bill', 
-      amount: -450.00, 
+    {
+      id: 'TRX-004',
+      type: 'expense',
+      category: 'Utilities',
+      description: 'Electricity Bill',
+      amount: -450.00,
       date: '2026-03-27',
       status: 'pending'
     },
   ]);
 
   const [accounts, setAccounts] = useState([
-    { 
-      id: 1, 
-      name: 'Main Operating Account', 
-      type: 'checking', 
-      balance: 15420.00, 
+    {
+      id: 1,
+      name: 'Main Operating Account',
+      type: 'checking',
+      balance: 15420.00,
       bank: 'National Bank',
       accountNumber: '****1234'
     },
-    { 
-      id: 2, 
-      name: 'Savings Account', 
-      type: 'savings', 
-      balance: 8950.00, 
+    {
+      id: 2,
+      name: 'Savings Account',
+      type: 'savings',
+      balance: 8950.00,
       bank: 'National Bank',
       accountNumber: '****5678'
     },
-    { 
-      id: 3, 
-      name: 'Petty Cash', 
-      type: 'cash', 
-      balance: 500.00, 
+    {
+      id: 3,
+      name: 'Petty Cash',
+      type: 'cash',
+      balance: 500.00,
       bank: 'On-site',
       accountNumber: 'N/A'
     },
   ]);
 
   const [invoices, setInvoices] = useState([
-    { 
-      id: 'INV-001', 
-      customer: 'ABC Construction', 
-      amount: 1250.00, 
+    {
+      id: 'INV-001',
+      customer: 'ABC Construction',
+      amount: 1250.00,
       dueDate: '2026-04-15',
       status: 'paid',
       date: '2026-03-28'
     },
-    { 
-      id: 'INV-002', 
-      customer: 'XYZ Homes', 
-      amount: 890.50, 
+    {
+      id: 'INV-002',
+      customer: 'XYZ Homes',
+      amount: 890.50,
       dueDate: '2026-04-20',
       status: 'pending',
       date: '2026-03-28'
     },
-    { 
-      id: 'INV-003', 
-      customer: 'BuildRight Inc', 
-      amount: 2100.00, 
+    {
+      id: 'INV-003',
+      customer: 'BuildRight Inc',
+      amount: 2100.00,
       dueDate: '2026-04-10',
       status: 'overdue',
       date: '2026-03-20'
@@ -146,12 +176,12 @@ export const Finance = () => {
     };
 
     setTransactions([...transactions, transactionToAdd]);
-    
+
     // Update account balance
     const mainAccount = accounts.find(acc => acc.id === 1);
     if (mainAccount) {
-      setAccounts(accounts.map(acc => 
-        acc.id === 1 
+      setAccounts(accounts.map(acc =>
+        acc.id === 1
           ? { ...acc, balance: acc.balance + transactionToAdd.amount }
           : acc
       ));
@@ -195,8 +225,8 @@ export const Finance = () => {
 
   // Update transaction status
   const updateTransactionStatus = (transactionId, newStatus) => {
-    setTransactions(transactions.map(transaction => 
-      transaction.id === transactionId 
+    setTransactions(transactions.map(transaction =>
+      transaction.id === transactionId
         ? { ...transaction, status: newStatus }
         : transaction
     ));
@@ -205,8 +235,8 @@ export const Finance = () => {
 
   // Update invoice status
   const updateInvoiceStatus = (invoiceId, newStatus) => {
-    setInvoices(invoices.map(invoice => 
-      invoice.id === invoiceId 
+    setInvoices(invoices.map(invoice =>
+      invoice.id === invoiceId
         ? { ...invoice, status: newStatus }
         : invoice
     ));
@@ -252,9 +282,11 @@ export const Finance = () => {
       'income': 'bg-accentClr text-white',
       'expense': 'bg-dangerClr text-white'
     };
+    const IconComponent = type === 'income' ? ArrowUp : ArrowDown;
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded ${styles[type]}`}>
-        {type.toUpperCase()}
+      <span className={`px-2 py-1 text-xs font-medium rounded flex items-center space-x-1 ${styles[type]}`}>
+        <IconComponent size={12} />
+        <span>{type.toUpperCase()}</span>
       </span>
     );
   };
@@ -301,10 +333,15 @@ export const Finance = () => {
 
       {/* Notification */}
       {notification.show && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${
+        <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 ${
           notification.type === 'success' ? 'bg-accentClr text-white' : 'bg-dangerClr text-white'
         }`}>
-          {notification.message}
+          {notification.type === 'success' ? (
+            <CheckCircle size={20} />
+          ) : (
+            <AlertCircle size={20} />
+          )}
+          <span>{notification.message}</span>
         </div>
       )}
 
@@ -313,7 +350,7 @@ export const Finance = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-accentClr rounded-lg p-3">
-              <span className="text-2xl">💰</span>
+              <Wallet size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Total Balance</p>
@@ -324,7 +361,7 @@ export const Finance = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-primaryClrLight rounded-lg p-3">
-              <span className="text-2xl">📈</span>
+              <TrendingUp size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Monthly Income</p>
@@ -335,7 +372,7 @@ export const Finance = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-dangerClr rounded-lg p-3">
-              <span className="text-2xl">📉</span>
+              <TrendingDown size={24} className="text-white" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Monthly Expenses</p>
@@ -346,7 +383,7 @@ export const Finance = () => {
         <div className="bg-bgLight rounded-lg shadow-card border border-secondaryClr p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0 bg-logoGold rounded-lg p-3">
-              <span className="text-2xl">🧾</span>
+              <FileText size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5">
               <p className="text-sm text-place">Pending Invoices</p>
@@ -362,43 +399,47 @@ export const Finance = () => {
           <nav className="flex space-x-8 px-6">
             <button
               onClick={() => setActiveTab('transactions')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'transactions'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Transactions
+              <DollarSign size={16} />
+              <span>Transactions</span>
             </button>
             <button
               onClick={() => setActiveTab('accounts')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'accounts'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Accounts
+              <Building size={16} />
+              <span>Accounts</span>
             </button>
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'invoices'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Invoices
+              <FileText size={16} />
+              <span>Invoices</span>
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
                 activeTab === 'reports'
                   ? 'border-primaryClr text-primaryClr'
                   : 'border-transparent text-place hover:text-primaryClr'
               }`}
             >
-              Reports
+              <BarChart3 size={16} />
+              <span>Reports</span>
             </button>
           </nav>
         </div>
@@ -407,26 +448,31 @@ export const Finance = () => {
           {/* Search and Actions */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex-1 max-w-md">
-              <input
-                type="text"
-                placeholder={`Search ${activeTab}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
-              />
+              <div className="relative">
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-place" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr bg-bgLight"
+                />
+              </div>
             </div>
             <div className="flex space-x-3">
-              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors">
-                📊 Generate Report
+              <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                <BarChart3 size={16} />
+                <span>Generate Report</span>
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (activeTab === 'transactions') setShowTransactionModal(true);
                   else if (activeTab === 'accounts') setShowAccountModal(true);
                 }}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                ➕ New {activeTab.slice(0, -1)}
+                <Plus size={16} />
+                <span>New {activeTab.slice(0, -1)}</span>
               </button>
             </div>
           </div>
@@ -467,25 +513,25 @@ export const Finance = () => {
                       <td className="py-3 px-4">{getStatusBadge(transaction.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('transaction', transaction)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Transaction"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Transaction">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Transaction">
+                            <Edit size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Print Receipt">
-                            🖨️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Print Receipt">
+                            <Printer size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('transaction', transaction.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Transaction"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -516,9 +562,7 @@ export const Finance = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center">
                           <div className="h-8 w-8 rounded-full bg-primaryClrLight flex items-center justify-center mr-3">
-                            <span className="text-primaryClrText text-sm font-medium">
-                              {account.name.charAt(0)}
-                            </span>
+                            <Building size={16} className="text-primaryClrText" />
                           </div>
                           <span className="font-medium text-primaryClr">{account.name}</span>
                         </div>
@@ -529,25 +573,25 @@ export const Finance = () => {
                       <td className="py-3 px-4 text-sm font-medium text-primaryClr">${account.balance.toFixed(2)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('account', account)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Account"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Account">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Account">
+                            <Edit size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="View Statement">
-                            📊
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="View Statement">
+                            <BarChart3 size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('account', account.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Account"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -586,32 +630,32 @@ export const Finance = () => {
                       <td className="py-3 px-4">{getStatusBadge(invoice.status)}</td>
                       <td className="py-3 px-4">
                         <div className="flex space-x-2">
-                          <button 
+                          <button
                             onClick={() => viewItemDetails('invoice', invoice)}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="View Invoice"
                           >
-                            👁️
+                            <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Edit Invoice">
-                            ✏️
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Invoice">
+                            <Edit size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => updateInvoiceStatus(invoice.id, invoice.status === 'pending' ? 'paid' : 'pending')}
-                            className="text-primaryClr hover:text-primaryClrLight"
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
                             title="Mark as Paid"
                           >
-                            💳
+                            <CreditCard size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight" title="Send Invoice">
-                            📧
+                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Send Invoice">
+                            <DollarSign size={16} />
                           </button>
-                          <button 
+                          <button
                             onClick={() => deleteItem('invoice', invoice.id)}
-                            className="text-dangerClr hover:text-dangerClrLight"
+                            className="text-dangerClr hover:text-dangerClrLight p-1"
                             title="Delete Invoice"
                           >
-                            🗑️
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -625,20 +669,20 @@ export const Finance = () => {
           {/* Reports */}
           {activeTab === 'reports' && (
             <div className="text-center py-12">
-              <span className="text-4xl">📊</span>
-              <h3 className="mt-4 text-lg font-medium text-primaryClr">Financial Reports</h3>
+              <BarChart3 size={48} className="mx-auto text-primaryClr mb-4" />
+              <h3 className="text-lg font-medium text-primaryClr">Financial Reports</h3>
               <p className="mt-2 text-place">Generate comprehensive financial reports and analytics</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 max-w-2xl mx-auto">
-                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors">
-                  <span className="text-2xl block mb-2">📈</span>
+                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors flex flex-col items-center space-y-2">
+                  <TrendingUp size={24} />
                   <span className="text-sm">Profit & Loss</span>
                 </button>
-                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors">
-                  <span className="text-2xl block mb-2">💰</span>
+                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors flex flex-col items-center space-y-2">
+                  <DollarSign size={24} />
                   <span className="text-sm">Cash Flow</span>
                 </button>
-                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors">
-                  <span className="text-2xl block mb-2">📊</span>
+                <button className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr p-4 rounded-lg transition-colors flex flex-col items-center space-y-2">
+                  <BarChart3 size={24} />
                   <span className="text-sm">Balance Sheet</span>
                 </button>
               </div>
@@ -651,7 +695,18 @@ export const Finance = () => {
       {showTransactionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Transaction</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <DollarSign size={20} />
+                <span>Add New Transaction</span>
+              </h2>
+              <button
+                onClick={() => setShowTransactionModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Type</label>
@@ -704,15 +759,17 @@ export const Finance = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowTransactionModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddTransaction}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Transaction
+                <Check size={16} />
+                <span>Add Transaction</span>
               </button>
             </div>
           </div>
@@ -723,7 +780,18 @@ export const Finance = () => {
       {showAccountModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">Add New Account</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Building size={20} />
+                <span>Add New Account</span>
+              </h2>
+              <button
+                onClick={() => setShowAccountModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-primaryClr mb-1">Account Name *</label>
@@ -777,15 +845,17 @@ export const Finance = () => {
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowAccountModal(false)}
-                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors"
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Cancel
+                <X size={16} />
+                <span>Cancel</span>
               </button>
               <button
                 onClick={handleAddAccount}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Add Account
+                <Check size={16} />
+                <span>Add Account</span>
               </button>
             </div>
           </div>
@@ -796,9 +866,18 @@ export const Finance = () => {
       {showViewModal && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-lg font-medium text-primaryClr mb-4">
-              {selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Eye size={20} />
+                <span>{selectedItem.type.charAt(0).toUpperCase() + selectedItem.type.slice(1)} Details</span>
+              </h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="space-y-3">
               {Object.entries(selectedItem.data).map(([key, value]) => (
                 <div key={key}>
@@ -812,9 +891,10 @@ export const Finance = () => {
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors"
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
-                Close
+                <X size={16} />
+                <span>Close</span>
               </button>
             </div>
           </div>
@@ -823,3 +903,5 @@ export const Finance = () => {
     </div>
   );
 };
+
+export default Finance;
