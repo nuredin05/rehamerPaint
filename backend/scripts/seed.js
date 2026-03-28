@@ -15,8 +15,10 @@ async function seedDatabase() {
     await sequelize.sync({ force: true });
     console.log('Database synchronized.');
 
+    // Import models
+    const { Company, User, Category, Unit, Product, Warehouse, InventoryStock, Department, Employee, Supplier, Customer, ChartOfAccounts } = require('../src/models');
+
     // Create sample company
-    const { Company } = require('../src/models');
     const company = await Company.create({
       name: 'RehamerPaint Demo Company',
       code: 'RP_DEMO',
@@ -28,7 +30,6 @@ async function seedDatabase() {
     console.log('Sample company created:', company.name);
 
     // Create admin user
-    const { User } = require('../src/models');
     const hashedPassword = await bcrypt.hash('admin123', config.security.bcryptRounds);
     const adminUser = await User.create({
       companyId: company.id,
@@ -42,7 +43,6 @@ async function seedDatabase() {
     console.log('Admin user created:', adminUser.username);
 
     // Create sample categories
-    const { Category } = require('../src/models');
     const categories = await Category.bulkCreate([
       {
         companyId: company.id,

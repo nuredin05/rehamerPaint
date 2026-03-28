@@ -5,8 +5,12 @@ const config = require('../config');
 // Create logs directory if it doesn't exist
 const fs = require('fs');
 const logsDir = path.dirname(config.logging.file);
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+try {
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+} catch (error) {
+  console.warn('Warning: Could not create logs directory:', error.message);
 }
 
 // Define log format
@@ -26,55 +30,64 @@ const logFormat = winston.format.combine(
   })
 );
 
-// Create logger instance
-const logger = winston.createLogger({
-  level: config.logging.level,
-  format: logFormat,
-  defaultMeta: { service: config.app.name },
-  transports: [
-    // File transport for all logs
-    new winston.transports.File({
-      filename: config.logging.file,
-      maxsize: config.logging.maxSize,
-      maxFiles: config.logging.maxFiles,
-      tailable: true
-    }),
-    
-    // Separate file for errors
-    new winston.transports.File({
-      filename: path.join(logsDir, 'error.log'),
-      level: 'error',
-      maxsize: config.logging.maxSize,
-      maxFiles: config.logging.maxFiles,
-      tailable: true
-    })
-  ],
-  
-  // Handle exceptions and rejections
-  exceptionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logsDir, 'exceptions.log')
-    })
-  ],
-  rejectionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logsDir, 'rejections.log')
-    })
-  ]
-});
-
-// Add console transport in development
-if (config.app.environment !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple(),
-      winston.format.printf(({ timestamp, level, message, ...meta }) => {
-        const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
-        return `${timestamp} [${level}]: ${message} ${metaStr}`;
+// Create logger with error handling
+let logger;
+try {
+  logger = winston.createLogger({
+    level: config.logging.level,
+    format: logFormat,
+    defaultMeta: { service: 'rehamerpaint-api' },
+    transports: [
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(),
+          winston.format.simple()
+        )
+      }),
+      new winston.transports.File({
+        filename: config.logging.file,
+        level: 'error',
+        maxsize: config.logging.maxSize,
+        maxFiles: config.logging.maxFiles,
+        tailable: true
       })
-    )
-  }));
+    ],
+    
+    // Handle exceptions and rejections
+    exceptionHandlers: [
+      new winston.transports.File({
+        filename: path.join(logsDir, 'exceptions.log')
+      })
+    ],
+    rejectionHandlers: [
+      new winston.transports.File({
+        filename: path.join(logsDir, 'rejections.log')
+      })
+    ]
+  });
+
+  // Add console transport in development
+  if (config.app.environment !== 'production') {
+    logger.add(new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple(),
+        winston.format.printf(({ timestamp, level, message, ...meta }) => {
+          const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
+          return `${timestamp} [${level}]: ${message} ${metaStr}`;
+        })
+      )
+    }));
+  }
+} catch (error) {
+  console.error('Error creating logger:', error.message);
+  // Fallback to simple console logger
+  logger = {
+    info: (message, meta) => console.log(message, meta || ''),
+    error: (message, meta) => console.error(message, meta || ''),
+    warn: (message, meta) => console.warn(message, meta || ''),
+    debug: (message, meta) => console.debug(message, meta || '')
+  };
 }
 
 // Create a stream object for Morgan HTTP logger

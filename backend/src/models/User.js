@@ -210,6 +210,17 @@ module.exports = (sequelize) => {
     });
   };
 
+  User.findByEmailOrUsername = function(identifier) {
+    return this.findOne({
+      where: {
+        [sequelize.Sequelize.Op.or]: [
+          { email: identifier },
+          { username: identifier }
+        ]
+      }
+    });
+  };
+
   // Associations
   User.associate = function(models) {
     // User belongs to Company

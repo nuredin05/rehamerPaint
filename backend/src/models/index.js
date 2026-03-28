@@ -14,17 +14,10 @@ const Unit = require('./Unit');
 const Product = require('./Product');
 const InventoryStock = require('./InventoryStock');
 const InventoryTransaction = require('./InventoryTransaction');
-const BOM = require('./BOM');
-const BOMComponent = require('./BOMComponent');
-const ProductionOrder = require('./ProductionOrder');
-const ProductionBatch = require('./ProductionBatch');
-const QualityTest = require('./QualityTest');
 const Supplier = require('./Supplier');
 const Customer = require('./Customer');
 const PurchaseOrder = require('./PurchaseOrder');
-const PurchaseOrderItem = require('./PurchaseOrderItem');
 const SalesOrder = require('./SalesOrder');
-const SalesOrderItem = require('./SalesOrderItem');
 const ChartOfAccounts = require('./ChartOfAccounts');
 const Transaction = require('./Transaction');
 const TransactionEntry = require('./TransactionEntry');
@@ -49,17 +42,10 @@ const models = {
   Product,
   InventoryStock,
   InventoryTransaction,
-  BOM,
-  BOMComponent,
-  ProductionOrder,
-  ProductionBatch,
-  QualityTest,
   Supplier,
   Customer,
   PurchaseOrder,
-  PurchaseOrderItem,
   SalesOrder,
-  SalesOrderItem,
   ChartOfAccounts,
   Transaction,
   TransactionEntry,
