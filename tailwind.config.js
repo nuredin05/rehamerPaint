@@ -10,38 +10,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors from logo
-        primaryClr: "#8C4830   ",       // deep black for text/nav B45309
-        primaryClrLight: "#A65B4B ",  // softer black/charcoal for hover states c88653
-        primaryClrDark: '#59331D',//#59331D 4c2000
-        primaryClrText: '#f7f9fc',
-        place: "605853",
+        // Primary brand colors - Professional Paint Factory Theme
+        primaryClr: "#2C3E50",       // Deep blue-gray - professional, trustworthy
+        primaryClrLight: "#34495E",  // Lighter blue-gray for hover states
+        primaryClrDark: "#1A252F",   // Darker blue-gray for emphasis
+        primaryClrText: '#FFFFFF',    // Crisp white text on primary
+        place: "#7F8C8D",           // Muted gray for placeholder text
 
-        // Background neutral
-        backgroundClr: "#D9D1D0",    // light ivory/neutral background
-        bgDark: "#414144ff",
-        bgDarkAll: "#393A3F",
-        bgLight: "#FFFFFF",
-        // Secondary accent (gold from logo)
-        secondaryClr: "#C9AE9B",     // muted gold accent
-        secondaryClrDark: "#B7937C", // darker gold for hover/active
+        // Background colors - Clean, professional
+        backgroundClr: "#F8F9FA",    // Very light gray - clean canvas feel
+        bgDark: "#2C3E50",          // Match primary for consistency
+        bgDarkAll: "#1A252F",        // Match primary dark
+        bgLight: "#FFFFFF",           // Pure white for cards
+        
+        // Secondary accent - Warm paint colors
+        secondaryClr: "#E67E22",     // Warm orange - paint bucket color
+        secondaryClrDark: "#D35400",  // Darker orange for hover/active
 
-        // Success/confirmation accent
-        accentClr: "#22e950ff",        // keep green for status badges
-        accentClrDark: "#28A745",
-        dangerClr: "#f72121ff",
-        dangerClrDark: "#df5858ff",
-        // Extra palette for consistency
-        logoGold: "#C9AE9B",         // matches "by Ana" cursive
-        logoBorder: "#FFD966",       // lighter gold for borders/highlights
+        // Success/confirmation - Professional green
+        accentClr: "#27AE60",        // Professional green for success
+        accentClrDark: "#229954",    // Darker green for hover
+        
+        // Danger/Error - Professional red
+        dangerClr: "#E74C3C",        // Professional red for errors
+        dangerClrDark: "#C0392B",    // Darker red for hover
+        
+        // Paint-themed accent colors
+        logoGold: "#F39C12",         // Golden yellow - paint highlight
+        logoBorder: "#F1C40F",       // Bright gold for borders/highlights
 
-        // Status colors
+        // Status colors - Professional palette
         status: {
-          pending: "#F59E0B",
-          progress: "#3B82F6",
-          ready: "#10B981",
-          paid: "#22C55E",
-          danger: "#EF4444"
+          pending: "#F39C12",        // Orange - work in progress
+          progress: "#3498DB",       // Blue - actively working
+          ready: "#27AE60",          // Green - completed
+          paid: "#2ECC71",          // Lighter green - payment received
+          danger: "#E74C3C"          // Red - issues/urgent
         }
       },
       fontFamily: {

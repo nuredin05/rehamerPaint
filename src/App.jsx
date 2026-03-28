@@ -4,6 +4,7 @@ import { Sidebar } from './components/layout/Sidebar-Lucide';
 import { Navbar } from './components/layout/Navbar-Lucide';
 import { Dashboard } from './pages/Dashboard-Lucide';
 import { Login } from './pages/Login-Lucide';
+import { Landing } from './pages/Landing';
 import { Inventory } from './pages/Inventory-Lucide';
 import { Sales } from './pages/Sales-Lucide';
 import { Procurement } from './pages/Procurement-Lucide';
@@ -21,7 +22,7 @@ function App() {
       <Router>
         <div className="min-h-screen bg-backgroundClr">
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/*" element={
               <div className="flex">
