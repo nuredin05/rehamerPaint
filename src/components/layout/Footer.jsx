@@ -1,5 +1,5 @@
 import React from 'react';
-import { PaintBucket, Phone, Mail, MapPin, MessageCircle, Share2, Users, Camera } from 'lucide-react';
+import { Phone, Mail, MapPin, MessageCircle, Share2, Users, Camera } from 'lucide-react';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -29,34 +29,34 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-primaryClr text-primaryClrText">
+    <footer className="bg-gradient-to-br from-bgDark to-bgDarkAll text-primaryClrText">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
           {/* Company Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <PaintBucket className="text-logoGold" size={32} />
-              <div>
-                <h3 className="text-xl font-bold">Rehamer</h3>
-                <p className="text-sm text-logoGold">Paint Industry</p>
-              </div>
+            <div className="flex items-center space-x-2 mb-4">
+              <img 
+                src="/src/assets/logo.png" 
+                alt="RehamerPaint Logo" 
+                className="h-6 w-auto transition-transform hover:scale-110"
+              />
+              <h3 className="text-xl font-bold bg-gradient-to-r from-rainbowYellow to-rainbowOrange bg-clip-text text-transparent">RehamerPaint</h3>
             </div>
-            <p className="text-sm leading-relaxed">
-              Your trusted partner for high-quality painting solutions. 
-              We deliver excellence in every brush stroke, transforming spaces 
-              with vibrant colors and lasting finishes.
+            <p className="text-primaryClrText/80 leading-relaxed">
+              Professional painting solutions that transform spaces and exceed expectations. Quality craftsmanship meets exceptional service.
             </p>
-            <div className="flex space-x-3">
-              <a href="#" className="bg-logoGold hover:bg-primaryClr text-primaryClr p-2 rounded-full transition-colors">
+            <div className="flex space-x-3 pt-4">
+              <a href="#" className="bg-gradient-to-r from-rainbowViolet to-rainbowIndigo hover:from-rainbowIndigo hover:to-rainbowBlue p-2 rounded-full transition-all transform hover:scale-110">
                 <MessageCircle size={18} />
               </a>
-              <a href="#" className="bg-logoGold hover:bg-primaryClr text-primaryClr p-2 rounded-full transition-colors">
+              <a href="#" className="bg-gradient-to-r from-rainbowOrange to-rainbowYellow hover:from-rainbowYellow hover:to-rainbowGreen p-2 rounded-full transition-all transform hover:scale-110">
                 <Share2 size={18} />
               </a>
-              <a href="#" className="bg-logoGold hover:bg-primaryClr text-primaryClr p-2 rounded-full transition-colors">
+              <a href="#" className="bg-gradient-to-r from-rainbowGreen to-rainbowBlue hover:from-rainbowBlue hover:to-rainbowIndigo p-2 rounded-full transition-all transform hover:scale-110">
                 <Users size={18} />
               </a>
-              <a href="#" className="bg-logoGold hover:bg-primaryClr text-primaryClr p-2 rounded-full transition-colors">
+              <a href="#" className="bg-gradient-to-r from-rainbowYellow to-rainbowOrange hover:from-rainbowOrange hover:to-rainbowRed p-2 rounded-full transition-all transform hover:scale-110">
                 <Camera size={18} />
               </a>
             </div>
@@ -64,16 +64,15 @@ export const Footer = () => {
 
           {/* Services */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-logoGold">Our Services</h4>
+            <h4 className="text-lg font-semibold bg-gradient-to-r from-rainbowOrange to-rainbowYellow bg-clip-text text-transparent">Our Services</h4>
             <ul className="space-y-2">
               {services.map((service, index) => (
                 <li key={index}>
                   <a 
-                    href="#" 
-                    className="text-sm hover:text-logoGold transition-colors flex items-center group"
+                    href={service.href} 
+                    className="text-primaryClrText/80 hover:text-rainbowYellow transition-colors"
                   >
-                    <span className="w-2 h-2 bg-logoGold rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    {service}
+                    {service.text}
                   </a>
                 </li>
               ))}
@@ -82,16 +81,15 @@ export const Footer = () => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-logoGold">Quick Links</h4>
+            <h4 className="text-lg font-semibold bg-gradient-to-r from-rainbowGreen to-rainbowBlue bg-clip-text text-transparent">Quick Links</h4>
             <ul className="space-y-2">
               {quickLinks.map((link, index) => (
                 <li key={index}>
                   <a 
-                    href="#" 
-                    className="text-sm hover:text-logoGold transition-colors flex items-center group"
+                    href={link.href} 
+                    className="text-primaryClrText/80 hover:text-rainbowGreen transition-colors"
                   >
-                    <span className="w-2 h-2 bg-logoGold rounded-full mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    {link}
+                    {link.text}
                   </a>
                 </li>
               ))}
@@ -100,37 +98,31 @@ export const Footer = () => {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-logoGold">Contact Info</h4>
+            <h4 className="text-lg font-semibold bg-gradient-to-r from-rainbowViolet to-rainbowIndigo bg-clip-text text-transparent">Contact Info</h4>
             <div className="space-y-3">
               {contactInfo.map((info, index) => {
                 const Icon = info.icon;
                 return (
-                  <div key={index} className="flex items-center space-x-3">
-                    <Icon className="text-logoGold" size={18} />
-                    <span className="text-sm">{info.text}</span>
+                  <div key={index} className="flex items-center space-x-2">
+                    <Icon className="text-rainbowOrange" size={16} />
+                    <span className="text-primaryClrText/80">{info.text}</span>
                   </div>
                 );
               })}
-            </div>
-            <div className="pt-4">
-              <h5 className="text-sm font-semibold mb-2 text-logoGold">Business Hours</h5>
-              <p className="text-sm">Mon - Fri: 8:00 AM - 6:00 PM</p>
-              <p className="text-sm">Sat: 9:00 AM - 4:00 PM</p>
-              <p className="text-sm">Sun: Closed</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-primaryClrLight mt-8 pt-8">
+        <div className="border-t border-primaryClrText/20 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-center md:text-left">
-              © {currentYear} Rehamer Paint Industry. All rights reserved.
+            <p className="text-primaryClrText/60 text-sm">
+              &copy; {currentYear} <span className="text-rainbowYellow font-semibold">RehamerPaint</span>. All rights reserved.
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-sm hover:text-logoGold transition-colors">Privacy Policy</a>
-              <a href="#" className="text-sm hover:text-logoGold transition-colors">Terms of Service</a>
-              <a href="#" className="text-sm hover:text-logoGold transition-colors">Sitemap</a>
+            <div className="flex flex-col md:flex-row space-x-4 md:space-y-0 md:space-x-4 space-y-2">
+              <a href="#" className="text-sm hover:text-rainbowOrange transition-colors">Privacy Policy</a>
+              <a href="#" className="text-sm hover:text-rainbowOrange transition-colors">Terms of Service</a>
+              <a href="#" className="text-sm hover:text-rainbowOrange transition-colors">Sitemap</a>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import apiService from '../services/api';
 
 const AuthContext = createContext(undefined);
 
@@ -17,15 +17,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check for existing auth token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     if (token) {
       // Validate token and set user
-      axios.get('http://localhost:3000/api/v1/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      }).then(response => {
-        setUser(response.data.data.user);
+      apiService.getProfile().then(response => {
+        setUser(response.user);
       }).catch(() => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
       }).finally(() => {
         setLoading(false);
       });
@@ -38,30 +37,43 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('🔐 Attempting login...', { identifier, password: '***' });
       
-      const response = await axios.post('http://localhost:3000/api/v1/auth/login', {
+      const response = await apiService.login({
         identifier,
         password
       });
 
-      console.log('✅ Login response:', response.data);
+      console.log('✅ Login response:', response);
 
-      const { user: userData, tokens } = response.data.data;
-      setUser(userData);
-      localStorage.setItem('token', tokens.accessToken);
+      // Handle different response formats
+      const userData = response.user || response.data?.user;
+      const token = response.token || response.data?.token || response.accessToken || response.data?.accessToken;
       
-      console.log('✅ User logged in successfully');
+      if (userData && token) {
+        setUser(userData);
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        console.log('✅ User logged in successfully');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       console.error('❌ Login error:', error);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-      }
-      throw new Error(error.response?.data?.error?.message || 'Login failed');
+      throw new Error(error.message || 'Login failed');
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      // Call logout API endpoint
+      await apiService.logout();
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+    }
   };
 
   return (

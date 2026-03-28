@@ -1,6 +1,6 @@
 // API Service for connecting to backend database
 
-const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your backend URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 class ApiService {
   // Generic request method
@@ -23,6 +23,14 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
+      
+      // Handle 401 Unauthorized - token expired
+      if (response.status === 401) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        throw new Error('Session expired. Please login again.');
+      }
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

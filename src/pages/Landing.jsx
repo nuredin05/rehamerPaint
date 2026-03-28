@@ -96,41 +96,32 @@ export const Landing = () => {
       <Header />
 
       {/* Hero Banner */}
-      <section id="home" className="relative min-h-screen pt-20">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1589927986089-358ddd5b89bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-primaryClr via-primaryClr/90 to-primaryClrLight/80"></div>
-        </div>
-        
-        <div className="relative container mx-auto px-4 py-24 lg:py-32 text-primaryClrText">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-10rem)]">
+      <section id="home" className="relative bg-gradient-to-br from-rainbowViolet via-rainbowIndigo to-rainbowBlue text-primaryClrText pt-20">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div className="relative container mx-auto px-4 py-24 lg:py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6 animate-fadeInLeft">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                 Transform Your Space with
-                <span className="text-logoGold"> Premium Paint</span> Solutions
+                <span className="bg-gradient-to-r from-rainbowYellow to-rainbowOrange bg-clip-text text-transparent"> Premium Paint</span> Solutions
               </h1>
               <p className="text-lg lg:text-xl leading-relaxed opacity-90">
                 Professional painting services that bring your vision to life. 
                 Quality craftsmanship meets exceptional service for results that exceed expectations.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button className="bg-logoGold hover:bg-primaryClr text-primaryClr px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center justify-center space-x-2 hover-lift">
+                <button className="bg-gradient-to-r from-rainbowOrange to-rainbowYellow hover:from-rainbowYellow hover:to-rainbowGreen text-white px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center justify-center space-x-2 hover-lift">
                   <span>Get Free Quote</span>
                   <ArrowRight size={20} />
                 </button>
-                <button className="border-2 border-white hover:bg-white hover:text-primaryClr text-white px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 hover-lift">
+                <button className="border-2 border-white hover:bg-white hover:text-rainbowViolet text-white px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center space-x-2 hover-lift">
                   <span>View Portfolio</span>
                   <Palette size={20} />
                 </button>
               </div>
               <div className="flex items-center space-x-8 pt-4">
                 <div className="animate-stagger-1">
-                  <p className="text-3xl font-bold text-logoGold">500+</p>
+                  <p className="text-3xl font-bold text-rainbowYellow">500+</p>
                   <p className="text-sm">Projects Completed</p>
                 </div>
                 <div className="animate-stagger-2">

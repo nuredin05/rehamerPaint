@@ -10,42 +10,58 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors - Professional Paint Factory Theme
-        primaryClr: "#2C3E50",       // Deep blue-gray - professional, trustworthy
-        primaryClrLight: "#34495E",  // Lighter blue-gray for hover states
-        primaryClrDark: "#1A252F",   // Darker blue-gray for emphasis
-        primaryClrText: '#FFFFFF',    // Crisp white text on primary
-        place: "#7F8C8D",           // Muted gray for placeholder text
+        // Rainbow-themed primary colors - Based on Rehamer Paint Logo
+        primaryClr: "#7E14FF",         // Purple from logo - vibrant and modern
+        primaryClrLight: "#9333EA",    // Lighter purple for hover states
+        primaryClrDark: "#6B21A8",     // Darker purple for emphasis
+        primaryClrText: '#FFFFFF',        // Crisp white text on primary
+        place: "#94A3B8",              // Soft gray for placeholder text
 
-        // Background colors - Clean, professional
-        backgroundClr: "#F8F9FA",    // Very light gray - clean canvas feel
-        bgDark: "#2C3E50",          // Match primary for consistency
-        bgDarkAll: "#1A252F",        // Match primary dark
-        bgLight: "#FFFFFF",           // Pure white for cards
+        // Background colors - Clean and modern
+        backgroundClr: "#FEFEFE",       // Pure white background
+        bgDark: "#1A1A2E",            // Deep purple-dark for contrast
+        bgDarkAll: "#0F0F23",          // Very dark purple for emphasis
+        bgLight: "#FFFFFF",             // Pure white for cards
         
-        // Secondary accent - Warm paint colors
-        secondaryClr: "#E67E22",     // Warm orange - paint bucket color
-        secondaryClrDark: "#D35400",  // Darker orange for hover/active
+        // Rainbow gradient colors - From logo spectrum
+        rainbowRed: "#FF0000",          // Bright red
+        rainbowOrange: "#FF7F00",       // Vibrant orange
+        rainbowYellow: "#FFFF00",        // Bright yellow
+        rainbowGreen: "#00FF00",        // Fresh green
+        rainbowBlue: "#0000FF",         // Pure blue
+        rainbowIndigo: "#4B0082",       // Deep indigo
+        rainbowViolet: "#9400D3",       // Rich violet
 
-        // Success/confirmation - Professional green
-        accentClr: "#27AE60",        // Professional green for success
-        accentClrDark: "#229954",    // Darker green for hover
-        
-        // Danger/Error - Professional red
-        dangerClr: "#E74C3C",        // Professional red for errors
-        dangerClrDark: "#C0392B",    // Darker red for hover
-        
-        // Paint-themed accent colors
-        logoGold: "#F39C12",         // Golden yellow - paint highlight
-        logoBorder: "#F1C40F",       // Bright gold for borders/highlights
+        // Paint-themed gradient colors
+        paintGradient: {
+          start: "#FF6B6B",          // Coral red
+          middle: "#4ECDC4",          // Mint green
+          end: "#45B7D1"              // Sky blue
+        },
 
-        // Status colors - Professional palette
+        // Secondary accent - Complementary colors
+        secondaryClr: "#FF6B6B",        // Coral red - warm and inviting
+        secondaryClrDark: "#E55555",    // Darker coral for hover/active
+
+        // Success/confirmation - Fresh colors
+        accentClr: "#4ECDC4",          // Mint green - fresh success
+        accentClrDark: "#3BA99C",      // Darker mint for hover
+        
+        // Danger/Error - Clear warning colors
+        dangerClr: "#FF6B6B",          // Coral red for attention
+        dangerClrDark: "#E55555",      // Darker coral for hover
+        
+        // Logo-inspired accent colors
+        logoGold: "#FFD700",           // Bright gold
+        logoBorder: "#FFA500",          // Orange border for highlights
+
+        // Status colors - Rainbow-themed palette
         status: {
-          pending: "#F39C12",        // Orange - work in progress
-          progress: "#3498DB",       // Blue - actively working
-          ready: "#27AE60",          // Green - completed
-          paid: "#2ECC71",          // Lighter green - payment received
-          danger: "#E74C3C"          // Red - issues/urgent
+          pending: "#FFD700",          // Gold - waiting
+          progress: "#00BFFF",          // Deep sky blue - working
+          ready: "#32CD32",            // Lime green - completed
+          paid: "#FF69B4",             // Hot pink - payment received
+          danger: "#FF4500"             // Orange red - urgent
         }
       },
       fontFamily: {

@@ -193,7 +193,7 @@ module.exports = (sequelize) => {
   User.findByEmailOrUsername = function(identifier) {
     return this.findOne({
       where: {
-        [sequelize.Sequelize.Op.or]: [
+        [this.sequelize.Sequelize.Op.or]: [
           { email: identifier },
           { username: identifier }
         ]

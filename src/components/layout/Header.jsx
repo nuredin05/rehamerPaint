@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, PaintBucket, Phone, Mail, MapPin, LogIn } from 'lucide-react';
+import { Menu, X, Phone, Mail, MapPin, LogIn } from 'lucide-react';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,7 +16,7 @@ export const Header = () => {
   return (
     <header className="fixed top-0 w-full bg-white shadow-md z-50">
       {/* Top Bar */}
-      <div className="bg-primaryClr text-primaryClrText py-2">
+      <div className="bg-gradient-to-r from-primaryClr via-rainbowViolet to-rainbowIndigo text-primaryClrText py-2">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center text-sm">
             <div className="hidden md:flex items-center space-x-4">
@@ -34,24 +34,28 @@ export const Header = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <a href="#" className="hover:text-logoGold transition-colors">Facebook</a>
-              <a href="#" className="hover:text-logoGold transition-colors">Twitter</a>
-              <a href="#" className="hover:text-logoGold transition-colors">LinkedIn</a>
+              <a href="#" className="hover:text-rainbowYellow transition-colors">Facebook</a>
+              <a href="#" className="hover:text-rainbowOrange transition-colors">Twitter</a>
+              <a href="#" className="hover:text-rainbowGreen transition-colors">LinkedIn</a>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <nav className="bg-white border-b border-secondaryClr">
+      <nav className="bg-white border-b border-rainbowViolet">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <PaintBucket className="text-primaryClr" size={32} />
+              <img 
+                src="/src/assets/logo.png" 
+                alt="RehamerPaint Logo" 
+                className="h-8 w-auto transition-transform hover:scale-110"
+              />
               <div>
-                <h1 className="text-xl font-bold text-primaryClr">Rehamer</h1>
-                <p className="text-xs text-logoGold font-medium">Paint Industry</p>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-rainbowViolet to-rainbowIndigo bg-clip-text text-transparent">Rehamer</h1>
+                <p className="text-xs text-rainbowOrange font-medium">Paint Industry</p>
               </div>
             </div>
 
@@ -61,7 +65,7 @@ export const Header = () => {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-primaryClr hover:text-logoGold transition-colors font-medium"
+                  className="text-primaryClr hover:text-rainbowViolet transition-colors font-medium"
                 >
                   {item.name}
                 </a>
@@ -72,12 +76,12 @@ export const Header = () => {
             <div className="hidden md:flex items-center space-x-3">
               <a 
                 href="/login" 
-                className="flex items-center space-x-2 text-primaryClr hover:text-logoGold transition-colors font-medium border border-primaryClr hover:border-logoGold px-4 py-2 rounded-lg"
+                className="flex items-center space-x-2 text-primaryClr hover:text-rainbowViolet hover:border-rainbowViolet transition-colors font-medium border border-primaryClr px-4 py-2 rounded-lg"
               >
                 <LogIn size={16} />
                 <span>Login</span>
               </a>
-              <button className="bg-logoGold hover:bg-primaryClr text-primaryClr px-6 py-2 rounded-lg font-medium transition-colors">
+              <button className="bg-gradient-to-r from-rainbowOrange to-rainbowYellow hover:from-rainbowYellow hover:to-rainbowGreen text-white px-6 py-2 rounded-lg font-medium transition-all transform hover:scale-105">
                 Get Quote
               </button>
             </div>

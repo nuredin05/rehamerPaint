@@ -7,8 +7,7 @@ import {
   Lock,
   AlertCircle,
   Loader2,
-  LogIn,
-  Building2
+  LogIn
 } from 'lucide-react';
 
 export const Login = () => {
@@ -35,28 +34,32 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-backgroundClr to-secondaryClr py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rainbowViolet via-rainbowIndigo to-rainbowBlue py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-primaryClr">
-            <Building2 size={32} className="text-primaryClrText" />
+          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-gradient-to-r from-rainbowViolet to-rainbowIndigo shadow-lg">
+            <img 
+              src="/src/assets/logo.png" 
+              alt="RehamerPaint Logo" 
+              className="h-10 w-auto"
+            />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-primaryClr">
+          <h2 className="mt-6 text-center text-3xl font-extrabold bg-gradient-to-r from-rainbowYellow to-rainbowOrange bg-clip-text text-transparent">
             RehamerPaint ERP
           </h2>
-          <p className="mt-2 text-center text-sm text-place">
+          <p className="mt-2 text-center text-sm text-primaryClrText/80">
             Sign in to your account
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="identifier" className="block text-sm font-medium text-primaryClr">
+              <label htmlFor="identifier" className="block text-sm font-medium text-primaryClrText">
                 Username or Email
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail size={18} className="text-place" />
+                  <Mail size={18} className="text-rainbowOrange" />
                 </div>
                 <input
                   id="identifier"
@@ -65,19 +68,19 @@ export const Login = () => {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-secondaryClr rounded-md shadow-sm placeholder-place focus:outline-none focus:ring-primaryClr focus:border-primaryClr sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-rainbowViolet/30 rounded-lg shadow-sm placeholder-primaryClrText/50 focus:outline-none focus:ring-2 focus:ring-rainbowViolet focus:border-transparent bg-white/10 backdrop-blur-sm text-primaryClrText"
                   placeholder="Enter username or email"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-primaryClr">
+              <label htmlFor="password" className="block text-sm font-medium text-primaryClrText">
                 Password
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock size={18} className="text-place" />
+                  <Lock size={18} className="text-rainbowOrange" />
                 </div>
                 <input
                   id="password"
@@ -86,7 +89,7 @@ export const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-secondaryClr rounded-md shadow-sm placeholder-place focus:outline-none focus:ring-primaryClr focus:border-primaryClr sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-rainbowViolet/30 rounded-lg shadow-sm placeholder-primaryClrText/50 focus:outline-none focus:ring-2 focus:ring-rainbowViolet focus:border-transparent bg-white/10 backdrop-blur-sm text-primaryClrText"
                   placeholder="Enter password"
                 />
                 <button
@@ -95,9 +98,9 @@ export const Login = () => {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeOff size={18} className="text-place" />
+                    <EyeOff size={18} className="text-rainbowOrange" />
                   ) : (
-                    <Eye size={18} className="text-place" />
+                    <Eye size={18} className="text-rainbowOrange" />
                   )}
                 </button>
               </div>
@@ -105,7 +108,7 @@ export const Login = () => {
           </div>
 
           {error && (
-            <div className="flex items-center space-x-2 text-dangerClr text-sm">
+            <div className="flex items-center space-x-2 text-rainbowRed text-sm">
               <AlertCircle size={16} />
               <span>{error}</span>
             </div>
@@ -115,7 +118,7 @@ export const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primaryClrText bg-primaryClr hover:bg-primaryClrDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primaryClr disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primaryClrText bg-gradient-to-r from-rainbowViolet to-rainbowIndigo hover:from-rainbowIndigo hover:to-rainbowBlue focus:outline-none focus:ring-2 focus:ring-rainbowViolet focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
             >
               {loading ? (
                 <>

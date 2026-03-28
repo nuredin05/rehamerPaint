@@ -1,22 +1,22 @@
-// Create admin user for RehamerPaint ERP
+// Create test user for RehamerPaint ERP
 const bcrypt = require('bcryptjs');
+const { sequelize } = require('./src/config/database');
 
-async function createAdminUser() {
+async function createTestUser() {
   try {
-    console.log('🔧 Creating admin user...');
-    
-    // Import models after database sync
-    const { User } = require('./src/models');
-    const { sequelize } = require('./src/config/database');
+    console.log('🔧 Creating test user...');
     
     // Connect to database
     await sequelize.authenticate();
     console.log('✅ Database connected successfully');
     
+    // Import and initialize User model
+    const { User } = require('./src/models');
+    
     // Hash password
     const hashedPassword = await bcrypt.hash('admin123', 12);
     
-    // Create admin user
+    // Create test user
     const user = await User.create({
       username: 'admin',
       email: 'admin@rehamerpaint.com',
@@ -25,10 +25,11 @@ async function createAdminUser() {
       lastName: 'Administrator',
       isActive: true,
       loginAttempts: 0,
-      lockedUntil: null
+      lockedUntil: null,
+      companyId: 1 // Assuming company with ID 1 exists
     });
     
-    console.log('✅ Admin user created successfully:', {
+    console.log('✅ Test user created successfully:', {
       id: user.id,
       username: user.username,
       email: user.email
@@ -39,10 +40,10 @@ async function createAdminUser() {
     console.log('   Password: admin123');
     
   } catch (error) {
-    console.error('❌ Error creating admin user:', error);
+    console.error('❌ Error creating test user:', error);
   } finally {
     await sequelize.close();
   }
 }
 
-createAdminUser();
+createTestUser();

@@ -5,6 +5,11 @@ import { Navbar } from './components/layout/Navbar-Lucide';
 import { Dashboard } from './pages/Dashboard-Lucide';
 import { Login } from './pages/Login-Lucide';
 import { Landing } from './pages/Landing';
+import { About } from './pages/About';
+import { Services } from './pages/Services';
+import { Products } from './pages/Products';
+import { Gallery } from './pages/Gallery';
+import { Contact } from './pages/Contact';
 import { Inventory } from './pages/Inventory-Lucide';
 import { Sales } from './pages/Sales-Lucide';
 import { Procurement } from './pages/Procurement-Lucide';
@@ -24,6 +29,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/*" element={
               <div className="flex">
                 <Sidebar />
