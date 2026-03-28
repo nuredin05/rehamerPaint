@@ -9,7 +9,7 @@ import { About } from './pages/About';
 import { Services } from './pages/Services';
 import { Products } from './pages/Products';
 import { Gallery } from './pages/Gallery';
-import { Contact } from './pages/Contact';
+import { Contact } from './pages/Contact-New';
 import { Inventory } from './pages/Inventory-Lucide';
 import { Sales } from './pages/Sales-Lucide';
 import { Procurement } from './pages/Procurement-Lucide';

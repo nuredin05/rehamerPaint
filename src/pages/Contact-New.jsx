@@ -103,7 +103,7 @@ export const Contact = () => {
                 Send Us a <span className="bg-gradient-to-r from-rainbowYellow to-rainbowOrange bg-clip-text text-transparent">Message</span>
               </h2>
               <p className="text-primaryClrText/80 max-w-2xl mx-auto">
-                We'd love to hear about your project and provide a personalized quote
+                We would love to hear about your project and provide a personalized quote
               </p>
             </div>
 
@@ -190,44 +190,44 @@ export const Contact = () => {
                   placeholder="Tell us about your project..."
                 />
               </div>
-            </div>
 
-            {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-rainbowGreen to-rainbowBlue text-white rounded-lg animate-fadeInUp">
-                <div className="flex items-center space-x-2">
-                  <Send size={20} />
-                  <span>Thank you! Your message has been sent successfully.</span>
+              {submitStatus === 'success' && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-rainbowGreen to-rainbowBlue text-white rounded-lg animate-fadeInUp">
+                  <div className="flex items-center space-x-2">
+                    <Send size={20} />
+                    <span>Thank you! Your message has been sent successfully.</span>
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-rainbowRed to-rainbowOrange text-white rounded-lg animate-fadeInUp">
-                <div className="flex items-center space-x-2">
-                  <Send size={20} />
-                  <span>Sorry, there was an error. Please try again.</span>
-                </div>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-rainbowViolet to-rainbowIndigo hover:from-rainbowIndigo hover:to-rainbowBlue text-white py-4 rounded-lg font-semibold transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Sending...</span>
-                </>
-              ) : (
-                <>
-                  <Send size={20} />
-                  <span>Send Message</span>
-                </>
               )}
-            </button>
-          </form>
+
+              {submitStatus === 'error' && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-rainbowRed to-rainbowOrange text-white rounded-lg animate-fadeInUp">
+                  <div className="flex items-center space-x-2">
+                    <Send size={20} />
+                    <span>Sorry, there was an error. Please try again.</span>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-rainbowViolet to-rainbowIndigo hover:from-rainbowIndigo hover:to-rainbowBlue text-white py-4 rounded-lg font-semibold transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={20} />
+                    <span>Send Message</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </section>
 
