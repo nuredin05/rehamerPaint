@@ -269,7 +269,9 @@ export const Admin = () => {
       'failed': 'bg-dangerClr text-white',
       'admin': 'bg-primaryClr text-primaryClrText',
       'manager': 'bg-logoGold text-primaryClr',
-      'user': 'bg-secondaryClr text-primaryClr'
+      'user': 'bg-secondaryClr text-primaryClr',
+      'operator': 'bg-secondaryClr text-primaryClr',
+      'viewer': 'bg-secondaryClr text-primaryClr',
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}>
