@@ -2,9 +2,11 @@ const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
 const { authenticate, requireRole } = require('../middleware/auth.middleware');
+const { Company, Sequelize } = require('../models');
 const adminHandlers = require('../utils/adminHandlers');
 
 const router = express.Router();
+const { Op } = Sequelize;
 
 router.use(authenticate);
 router.use(requireRole('admin'));
@@ -321,8 +323,21 @@ router.get('/companies', [
   query('search').optional().isString()
 ], async (req, res) => {
   try {
-    // TODO: Implement company listing logic (admin only)
-    return ResponseHelper.success(res, [], 'Companies retrieved successfully');
+    const where = {};
+    if (req.query.search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${req.query.search}%` } },
+        { code: { [Op.like]: `%${req.query.search}%` } },
+        { email: { [Op.like]: `%${req.query.search}%` } },
+      ];
+    }
+    const rows = await Company.findAll({
+      where,
+      limit: Math.min(parseInt(req.query.limit, 10) || 100, 200),
+      offset: ((parseInt(req.query.page, 10) || 1) - 1) * (Math.min(parseInt(req.query.limit, 10) || 100, 200)),
+      order: [['created_at', 'DESC']],
+    });
+    return ResponseHelper.success(res, rows, 'Companies retrieved successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to retrieve companies');
   }
