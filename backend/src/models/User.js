@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const config = require('../config');
 
@@ -202,7 +202,7 @@ module.exports = (sequelize) => {
   User.findByEmailOrUsername = function(identifier) {
     return this.findOne({
       where: {
-        [sequelize.Sequelize.Op.or]: [
+        [Op.or]: [
           { email: identifier },
           { username: identifier }
         ]

@@ -148,7 +148,12 @@ router.post('/login', [
     }
 
     // Validate password
+    console.log('DEBUG - Login attempt:', { identifier, passwordLength: password?.length });
+    console.log('DEBUG - User found:', { id: user.id, email: user.email, passwordHash: user.passwordHash?.substring(0, 20) + '...' });
+    
     const isValidPassword = await user.validatePassword(password);
+    
+    console.log('DEBUG - Password validation result:', isValidPassword);
 
     if (!isValidPassword) {
       // Increment login attempts
