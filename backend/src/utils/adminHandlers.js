@@ -56,6 +56,8 @@ async function listUsers(req, res) {
       {
         model: Employee,
         as: 'employee',
+        // Use a minimal attribute set because some installations have partial employee schema
+        attributes: ['id', 'userId', 'departmentId', 'employeeCode', 'firstName', 'lastName', 'email', 'isActive'],
         required: false,
         include: [
           {
@@ -69,7 +71,8 @@ async function listUsers(req, res) {
     ],
     limit: lim,
     offset: off,
-    order: [['createdAt', 'DESC']],
+    // Keep ordering on physical column name to avoid alias mismatch on some MySQL setups
+    order: [['created_at', 'DESC']],
   });
 
   const data = rows.map((u) => {
