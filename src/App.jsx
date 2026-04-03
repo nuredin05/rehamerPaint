@@ -42,7 +42,8 @@ function ErpShell() {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    // If logged out (or token expired), send user to public landing page.
+    return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
   if (!canAccessPath(user.role, location.pathname)) {
