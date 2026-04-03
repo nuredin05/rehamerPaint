@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Package,
   DollarSign,
@@ -11,8 +11,73 @@ import {
   TrendingUp,
   TrendingDown
 } from 'lucide-react';
+import apiService from '../services/api';
+import { useApiData } from '../hooks/useApiData';
 
 export const Dashboard = () => {
+  const { data: productsRaw, loading: productsLoading } = useApiData(
+    () => apiService.getProducts({ limit: 200 }),
+    []
+  );
+  const { data: customersRaw, loading: customersLoading } = useApiData(
+    () => apiService.getCustomers({ limit: 200 }),
+    []
+  );
+  const { data: ordersRaw, loading: ordersLoading } = useApiData(
+    () => apiService.getOrders({ limit: 50 }),
+    []
+  );
+  const { data: transactionsRaw, loading: txLoading } = useApiData(
+    () => apiService.getInventoryTransactions({ limit: 20 }),
+    []
+  );
+
+  const products = Array.isArray(productsRaw) ? productsRaw : [];
+  const customers = Array.isArray(customersRaw) ? customersRaw : [];
+  const orders = Array.isArray(ordersRaw) ? ordersRaw : [];
+  const transactions = Array.isArray(transactionsRaw) ? transactionsRaw : [];
+
+  const stats = useMemo(() => {
+    const totalProducts = products.length;
+    const totalCustomers = customers.length;
+    const totalOrders = orders.length;
+    const totalSales = orders.reduce((sum, o) => sum + parseFloat(o.amount || 0), 0);
+
+    return { totalProducts, totalCustomers, totalOrders, totalSales };
+  }, [products, customers, orders]);
+
+  const formatShortDate = (d) => {
+    if (!d) return '—';
+    const date = new Date(d);
+    if (Number.isNaN(date.getTime())) return String(d).slice(0, 10);
+    return date.toISOString().slice(0, 10);
+  };
+
+  const recentActivity = useMemo(() => {
+    const items = [];
+
+    orders.slice(0, 3).forEach((o) => {
+      items.push({
+        type: 'order',
+        text: `New sales order ${o.id} created`,
+        meta: o.date ? `Date: ${formatShortDate(o.date)}` : '—',
+      });
+    });
+
+    transactions.slice(0, 3).forEach((t) => {
+      items.push({
+        type: 'inventory',
+        text: `Inventory updated for ${t.product}`,
+        meta: t.date ? `Date: ${formatShortDate(t.date)}` : '—',
+      });
+    });
+
+    // Prefer orders first, then inventory. UI only needs a few items.
+    return items.slice(0, 3);
+  }, [orders, transactions]);
+
+  const isLoading = productsLoading || customersLoading || ordersLoading || txLoading;
+
   return (
     <div>
       <div className="mb-8">
@@ -30,7 +95,9 @@ export const Dashboard = () => {
             <div className="ml-5 w-0 flex-1">
               <d>
                 <dt className="text-sm font-medium text-place truncate">Total Products</dt>
-                <dd className="text-lg font-medium text-primaryClr">1,234</dd>
+                <dd className="text-lg font-medium text-primaryClr">
+                  {isLoading ? '—' : stats.totalProducts}
+                </dd>
               </d>
             </div>
           </div>
@@ -44,7 +111,9 @@ export const Dashboard = () => {
             <div className="ml-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-place truncate">Total Sales</dt>
-                <dd className="text-lg font-medium text-primaryClr">$45,678</dd>
+                <dd className="text-lg font-medium text-primaryClr">
+                  {isLoading ? '—' : `$${stats.totalSales.toFixed(2)}`}
+                </dd>
               </dl>
             </div>
           </div>
@@ -58,7 +127,9 @@ export const Dashboard = () => {
             <div className="ml-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-place truncate">Customers</dt>
-                <dd className="text-lg font-medium text-primaryClr">892</dd>
+                <dd className="text-lg font-medium text-primaryClr">
+                  {isLoading ? '—' : stats.totalCustomers}
+                </dd>
               </dl>
             </div>
           </div>
@@ -72,7 +143,9 @@ export const Dashboard = () => {
             <div className="ml-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-place truncate">Orders</dt>
-                <dd className="text-lg font-medium text-primaryClr">156</dd>
+                <dd className="text-lg font-medium text-primaryClr">
+                  {isLoading ? '—' : stats.totalOrders}
+                </dd>
               </dl>
             </div>
           </div>
@@ -113,27 +186,19 @@ export const Dashboard = () => {
           </div>
           <div className="p-6">
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 h-2 w-2 bg-accentClr rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-primaryClr">New sales order #1234 created</p>
-                  <p className="text-xs text-place">2 minutes ago</p>
+              {recentActivity.map((a, idx) => (
+                <div key={`${a.type}-${idx}`} className="flex items-center space-x-3">
+                  <div
+                    className={`flex-shrink-0 h-2 w-2 rounded-full ${
+                      a.type === 'order' ? 'bg-accentClr' : 'bg-primaryClrLight'
+                    }`}
+                  ></div>
+                  <div className="flex-1">
+                    <p className="text-sm text-primaryClr">{a.text}</p>
+                    <p className="text-xs text-place">{a.meta}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 h-2 w-2 bg-primaryClr rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-primaryClr">Inventory updated for Product #567</p>
-                  <p className="text-xs text-place">15 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0 h-2 w-2 bg-logoGold rounded-full"></div>
-                <div className="flex-1">
-                  <p className="text-sm text-primaryClr">Purchase order #890 received</p>
-                  <p className="text-xs text-place">1 hour ago</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
