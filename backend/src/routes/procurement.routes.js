@@ -1,11 +1,14 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate } = require('../middleware/auth.middleware');
 const { Supplier, PurchaseOrder, Sequelize } = require('../models');
 
 const router = express.Router();
 const { Op } = Sequelize;
 const isSchemaIssue = (error) => /doesn't exist|Unknown column/i.test(error?.original?.sqlMessage || error?.message || '');
+
+router.use(authenticate);
 
 /**
  * @swagger
@@ -155,12 +158,45 @@ router.get('/suppliers', [
  */
 router.post('/suppliers', [
   body('name').notEmpty().withMessage('Supplier name is required'),
-  body('supplierCode').notEmpty().withMessage('Supplier code is required'),
+  // UI currently creates suppliers without supplierCode; we generate it server-side.
+  body('supplierCode').optional().isString().withMessage('supplierCode must be a string'),
   body('email').optional().isEmail().withMessage('Valid email is required')
 ], async (req, res) => {
   try {
-    // TODO: Implement supplier creation logic
-    return ResponseHelper.created(res, {}, 'Supplier created successfully');
+    const companyId = req.user.companyId;
+    const {
+      name,
+      supplierCode: requestedCode,
+      contactPerson,
+      email,
+      phone,
+      address,
+      paymentTerms,
+      taxId,
+      isActive,
+    } = req.body;
+
+    if (!name) return ResponseHelper.badRequest(res, 'Supplier name is required');
+
+    const supplierCode =
+      requestedCode && String(requestedCode).trim()
+        ? String(requestedCode).trim()
+        : `SUP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const created = await Supplier.create({
+      companyId,
+      supplierCode,
+      name: String(name).trim(),
+      contactPerson: contactPerson || null,
+      email: email || null,
+      phone: phone || null,
+      address: address || null,
+      paymentTerms: paymentTerms || null,
+      taxId: taxId || null,
+      isActive: isActive !== undefined ? !!isActive : true,
+    });
+
+    return ResponseHelper.created(res, created, 'Supplier created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create supplier');
   }
@@ -345,14 +381,80 @@ router.get('/purchase-orders', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/purchase-orders', [
-  body('supplierId').isInt().withMessage('Valid supplier ID is required'),
-  body('orderDate').isISO8601().withMessage('Valid order date is required'),
-  body('expectedDeliveryDate').isISO8601().withMessage('Valid expected delivery date is required'),
-  body('items').isArray().withMessage('Items array is required')
+  // UI creates POs in a simplified shape; we resolve missing fields server-side.
+  body('supplierId').optional().isInt().withMessage('supplierId must be an integer'),
+  body('supplier').optional().isString().withMessage('supplier must be a string'),
+  body('orderDate').optional().isISO8601().withMessage('orderDate must be a date'),
+  body('expectedDeliveryDate').optional().isISO8601().withMessage('expectedDeliveryDate must be a date'),
+  body('deliveryDate').optional().isISO8601().withMessage('deliveryDate must be a date'),
+  body('amount').optional().isFloat({ min: 0 }).withMessage('amount must be a number'),
+  body('items').optional().isArray().withMessage('items must be an array'),
 ], async (req, res) => {
   try {
-    // TODO: Implement purchase order creation logic
-    return ResponseHelper.created(res, {}, 'Purchase order created successfully');
+    const companyId = req.user.companyId;
+    const {
+      supplierId: requestedSupplierId,
+      supplier: supplierName,
+      orderDate,
+      expectedDeliveryDate,
+      deliveryDate,
+      amount,
+      items,
+      notes,
+    } = req.body;
+
+    let resolvedSupplierId = null;
+    if (requestedSupplierId) {
+      const s = await Supplier.findOne({
+        where: { id: parseInt(requestedSupplierId, 10), companyId },
+      });
+      resolvedSupplierId = s?.id ?? null;
+    } else if (supplierName) {
+      const s = await Supplier.findOne({
+        where: { name: String(supplierName), companyId },
+      });
+      resolvedSupplierId = s?.id ?? null;
+    }
+
+    if (!resolvedSupplierId) {
+      return ResponseHelper.badRequest(res, 'Supplier is required for purchase order creation');
+    }
+
+    const orderDateValue = orderDate ? String(orderDate) : new Date().toISOString().slice(0, 10);
+    const expectedDeliveryDateValue =
+      expectedDeliveryDate ? String(expectedDeliveryDate) : deliveryDate ? String(deliveryDate) : null;
+
+    let totalAmount = 0;
+    if (amount !== undefined && amount !== null && amount !== '') {
+      const v = parseFloat(amount);
+      if (Number.isFinite(v)) totalAmount = v;
+    } else if (Array.isArray(items)) {
+      // We don't persist items without PurchaseOrderItem model; totals are computed for the PO header.
+      totalAmount = items.reduce((sum, it) => {
+        const q = parseFloat(it?.quantity ?? 0);
+        const up = parseFloat(it?.unitPrice ?? 0);
+        return sum + (Number.isFinite(q) && Number.isFinite(up) ? q * up : 0);
+      }, 0);
+    }
+
+    const orderNumber = `PO-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const created = await PurchaseOrder.create({
+      companyId,
+      supplierId: resolvedSupplierId,
+      orderNumber,
+      orderDate: orderDateValue,
+      expectedDeliveryDate: expectedDeliveryDateValue,
+      status: 'draft',
+      totalAmount,
+      taxAmount: 0,
+      discountAmount: 0,
+      netAmount: totalAmount,
+      notes: notes || null,
+      createdBy: req.user.id,
+    });
+
+    return ResponseHelper.created(res, created, 'Purchase order created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create purchase order');
   }

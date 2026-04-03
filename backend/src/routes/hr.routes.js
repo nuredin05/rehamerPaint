@@ -1,11 +1,14 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate } = require('../middleware/auth.middleware');
 const { Employee, Attendance, Payroll, Department, Sequelize } = require('../models');
 
 const router = express.Router();
 const { Op } = Sequelize;
 const isSchemaIssue = (error) => /doesn't exist|Unknown column/i.test(error?.original?.sqlMessage || error?.message || '');
+
+router.use(authenticate);
 
 /**
  * @swagger
@@ -174,17 +177,98 @@ router.get('/employees', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/employees', [
-  body('firstName').notEmpty().withMessage('First name is required'),
-  body('lastName').notEmpty().withMessage('Last name is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('hireDate').isISO8601().withMessage('Valid hire date is required'),
-  body('departmentId').isInt().withMessage('Valid department ID is required')
+  // UI uses a simplified payload (name/email/department/position/salary). Backend creation is TODO,
+  // so we relax validation to allow simplified calls.
+  body('firstName').optional().isString(),
+  body('lastName').optional().isString(),
+  body('email').optional().isEmail(),
+  body('hireDate').optional().isISO8601(),
+  body('departmentId').optional().isInt()
 ], async (req, res) => {
   try {
-    // TODO: Implement employee creation logic
-    return ResponseHelper.created(res, {}, 'Employee created successfully');
+    const companyId = req.user.companyId;
+    const firstName = String(req.body.firstName ?? '').trim();
+    const lastName = String(req.body.lastName ?? '').trim() || 'Employee';
+    const email = req.body.email ? String(req.body.email).trim() : null;
+    const position = req.body.position ? String(req.body.position).trim() : null;
+    const salary = req.body.salary !== undefined && req.body.salary !== null && req.body.salary !== ''
+      ? parseFloat(req.body.salary)
+      : null;
+    const hireDateRaw = req.body.hireDate ? String(req.body.hireDate) : null;
+    const hireDate = hireDateRaw ? new Date(hireDateRaw) : new Date();
+
+    const departmentId = req.body.departmentId !== undefined && req.body.departmentId !== null
+      ? parseInt(req.body.departmentId, 10)
+      : null;
+
+    const status = req.body.status;
+    const isActive = status === 'active' || status === true || status === 1;
+
+    const employeeCode = `EMP-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+    const created = await Employee.create({
+      companyId,
+      departmentId,
+      firstName: firstName || 'Employee',
+      lastName,
+      email,
+      position,
+      salary: Number.isFinite(salary) ? salary : null,
+      hireDate,
+      employeeCode,
+      isActive
+    });
+
+    return ResponseHelper.created(res, created, 'Employee created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create employee');
+  }
+});
+
+/**
+ * @swagger
+ * /hr/departments:
+ *   get:
+ *     summary: List departments
+ */
+router.get('/departments', async (req, res) => {
+  try {
+    const companyId = req.user?.companyId;
+    const rows = await Department.findAll({
+      where: companyId ? { companyId } : undefined,
+      order: [['created_at', 'DESC']],
+    });
+    return ResponseHelper.success(res, rows, 'Departments retrieved successfully');
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to retrieve departments');
+  }
+});
+
+/**
+ * @swagger
+ * /hr/departments:
+ *   post:
+ *     summary: Create a new department
+ */
+router.post('/departments', [
+  body('name').notEmpty().withMessage('Department name is required'),
+  body('managerId').optional().isInt(),
+  body('description').optional().isString(),
+], async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+    const { name, managerId, description } = req.body;
+
+    const created = await Department.create({
+      companyId,
+      name: String(name).trim(),
+      managerId: managerId !== undefined && managerId !== null ? parseInt(managerId, 10) : null,
+      description: description || null,
+    });
+
+    return ResponseHelper.created(res, created, 'Department created successfully');
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to create department');
   }
 });
 
@@ -393,8 +477,40 @@ router.post('/attendance', [
   body('status').isIn(['present', 'absent', 'late', 'half_day']).withMessage('Valid status is required')
 ], async (req, res) => {
   try {
-    // TODO: Implement attendance recording logic
-    return ResponseHelper.created(res, {}, 'Attendance recorded successfully');
+    const companyId = req.user.companyId;
+    const employeeId = parseInt(req.body.employeeId, 10);
+
+    const employee = await Employee.findOne({
+      where: { id: employeeId, companyId },
+      attributes: ['id']
+    });
+
+    if (!employee) {
+      return ResponseHelper.notFound(res, 'Employee not found');
+    }
+
+    const date = String(req.body.date);
+    const status = req.body.status;
+
+    const breakDuration = req.body.breakDuration !== undefined && req.body.breakDuration !== null
+      ? parseInt(req.body.breakDuration, 10)
+      : 0;
+    const overtimeHours = req.body.overtimeHours !== undefined && req.body.overtimeHours !== null
+      ? parseFloat(req.body.overtimeHours)
+      : 0;
+
+    const created = await Attendance.create({
+      employeeId,
+      date,
+      checkIn: req.body.checkIn ? String(req.body.checkIn) : null,
+      checkOut: req.body.checkOut ? String(req.body.checkOut) : null,
+      breakDuration: Number.isFinite(breakDuration) ? breakDuration : 0,
+      overtimeHours: Number.isFinite(overtimeHours) ? overtimeHours : 0,
+      status,
+      notes: req.body.notes ? String(req.body.notes) : null
+    });
+
+    return ResponseHelper.created(res, created, 'Attendance recorded successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to record attendance');
   }
@@ -551,8 +667,41 @@ router.post('/payroll', [
   body('employeeIds').isArray().withMessage('Employee IDs array is required')
 ], async (req, res) => {
   try {
-    // TODO: Implement payroll generation logic
-    return ResponseHelper.created(res, {}, 'Payroll generated successfully');
+    const companyId = req.user.companyId;
+    const payPeriodStart = String(req.body.payPeriodStart);
+    const payPeriodEnd = String(req.body.payPeriodEnd);
+    const employeeIds = (req.body.employeeIds || []).map((id) => parseInt(id, 10)).filter((n) => Number.isFinite(n));
+
+    if (!employeeIds.length) {
+      return ResponseHelper.badRequest(res, 'Employee IDs array cannot be empty');
+    }
+
+    const employees = await Employee.findAll({
+      where: { id: employeeIds, companyId },
+      attributes: ['id', 'salary']
+    });
+
+    const createdRows = [];
+    for (const emp of employees) {
+      const basicSalary = emp.salary !== null && emp.salary !== undefined ? parseFloat(emp.salary) : 0;
+
+      const created = await Payroll.create({
+        employeeId: emp.id,
+        payPeriodStart,
+        payPeriodEnd,
+        basicSalary: Number.isFinite(basicSalary) ? basicSalary : 0,
+        overtimePay: 0,
+        deductions: 0,
+        bonuses: 0,
+        netSalary: Number.isFinite(basicSalary) ? basicSalary : 0,
+        status: 'draft',
+        paymentDate: null
+      });
+
+      createdRows.push(created);
+    }
+
+    return ResponseHelper.created(res, createdRows, 'Payroll generated successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to generate payroll');
   }

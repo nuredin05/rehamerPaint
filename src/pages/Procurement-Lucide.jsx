@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../services/api';
 import {
   ShoppingCart,
   Truck,
@@ -121,19 +122,34 @@ export const Procurement = () => {
       return;
     }
 
-    const orderToAdd = {
-      id: `PO-${String(purchaseOrders.length + 1).padStart(3, '0')}`,
-      ...newOrder,
-      quantity: parseInt(newOrder.quantity),
-      amount: parseFloat(newOrder.amount),
-      date: new Date().toISOString().split('T')[0],
-      status: 'pending'
-    };
+    (async () => {
+      try {
+        const created = await apiService.createPurchaseOrder({
+          supplier: newOrder.supplier,
+          amount: parseFloat(newOrder.amount),
+          deliveryDate: newOrder.deliveryDate || undefined,
+          orderDate: new Date().toISOString().slice(0, 10),
+        });
 
-    setPurchaseOrders([...purchaseOrders, orderToAdd]);
-    setNewOrder({ supplier: '', product: '', quantity: '', amount: '', deliveryDate: '' });
-    setShowOrderModal(false);
-    showNotification('Purchase order added successfully', 'success');
+        const orderToAdd = {
+          id: created?.orderNumber ?? `PO-${String(purchaseOrders.length + 1).padStart(3, '0')}`,
+          supplier: newOrder.supplier,
+          product: newOrder.product,
+          quantity: parseInt(newOrder.quantity, 10),
+          amount: parseFloat(newOrder.amount),
+          date: created?.orderDate ?? new Date().toISOString().split('T')[0],
+          deliveryDate: newOrder.deliveryDate,
+          status: 'pending',
+        };
+
+        setPurchaseOrders([...purchaseOrders, orderToAdd]);
+        setNewOrder({ supplier: '', product: '', quantity: '', amount: '', deliveryDate: '' });
+        setShowOrderModal(false);
+        showNotification('Purchase order added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create purchase order', 'error');
+      }
+    })();
   };
 
   const handleAddSupplier = () => {
@@ -142,15 +158,33 @@ export const Procurement = () => {
       return;
     }
 
-    const supplierToAdd = {
-      id: suppliers.length + 1,
-      ...newSupplier
-    };
+    (async () => {
+      try {
+        const created = await apiService.createSupplier({
+          name: newSupplier.name,
+          email: newSupplier.email,
+          phone: newSupplier.phone,
+          address: newSupplier.address,
+          isActive: newSupplier.status === 'active',
+        });
 
-    setSuppliers([...suppliers, supplierToAdd]);
-    setNewSupplier({ name: '', email: '', phone: '', address: '', status: 'active' });
-    setShowSupplierModal(false);
-    showNotification('Supplier added successfully', 'success');
+        const supplierToAdd = {
+          id: created?.id ?? suppliers.length + 1,
+          name: newSupplier.name,
+          email: newSupplier.email,
+          phone: newSupplier.phone,
+          address: newSupplier.address,
+          status: newSupplier.status,
+        };
+
+        setSuppliers([...suppliers, supplierToAdd]);
+        setNewSupplier({ name: '', email: '', phone: '', address: '', status: 'active' });
+        setShowSupplierModal(false);
+        showNotification('Supplier added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create supplier', 'error');
+      }
+    })();
   };
 
   const updateOrderStatus = (orderId, newStatus) => {

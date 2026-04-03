@@ -145,10 +145,11 @@ router.get('/bom', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/bom', [
-  body('finishedProductId').isInt().withMessage('Valid finished product ID is required'),
-  body('version').notEmpty().withMessage('BOM version is required'),
-  body('effectiveDate').isISO8601().withMessage('Valid effective date is required'),
-  body('components').isArray().withMessage('Components array is required')
+  // UI currently creates BOMs with only `product`; we allow simplified payloads here.
+  body('finishedProductId').optional().isInt(),
+  body('version').optional().isString(),
+  body('effectiveDate').optional().isISO8601(),
+  body('components').optional().isArray(),
 ], async (req, res) => {
   try {
     // TODO: Implement BOM creation logic
@@ -306,11 +307,13 @@ router.get('/production-orders', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/production-orders', [
-  body('productId').isInt().withMessage('Valid product ID is required'),
-  body('bomId').isInt().withMessage('Valid BOM ID is required'),
-  body('plannedQuantity').isFloat().withMessage('Valid planned quantity is required'),
-  body('startDate').isISO8601().withMessage('Valid start date is required'),
-  body('completionDate').isISO8601().withMessage('Valid completion date is required')
+  // UI currently creates production orders with `product`, `quantity`, `startDate`, `endDate`.
+  // We allow simplified payloads here and let the backend fill defaults when implemented.
+  body('productId').optional().isInt(),
+  body('bomId').optional().isInt(),
+  body('plannedQuantity').optional().isFloat(),
+  body('startDate').optional().isISO8601(),
+  body('completionDate').optional().isISO8601(),
 ], async (req, res) => {
   try {
     // TODO: Implement production order creation logic

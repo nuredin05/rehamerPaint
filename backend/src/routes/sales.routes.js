@@ -2,7 +2,7 @@ const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
 const { authenticate } = require('../middleware/auth.middleware');
-const { Customer, SalesOrder, Invoice, Sequelize } = require('../models');
+const { Customer, SalesOrder, Invoice, Sequelize, sequelize } = require('../models');
 
 const router = express.Router();
 const { Op } = Sequelize;
@@ -165,12 +165,53 @@ router.get('/customers', [
  */
 router.post('/customers', [
   body('name').notEmpty().withMessage('Customer name is required'),
-  body('customerCode').notEmpty().withMessage('Customer code is required'),
+  // UI currently creates customers without customerCode; we generate it server-side.
+  body('customerCode').optional().isString().withMessage('customerCode must be a string'),
   body('email').optional().isEmail().withMessage('Valid email is required')
 ], async (req, res) => {
   try {
-    // TODO: Implement customer creation logic
-    return ResponseHelper.created(res, {}, 'Customer created successfully');
+    const companyId = req.user.companyId;
+    const {
+      name,
+      customerCode: requestedCode,
+      contactPerson,
+      email,
+      phone,
+      address,
+      paymentTerms,
+      creditLimit,
+      taxId,
+    } = req.body;
+
+    if (!name) {
+      return ResponseHelper.badRequest(res, 'Customer name is required', 'VALIDATION_ERROR');
+    }
+
+    const customerCode =
+      requestedCode && String(requestedCode).trim()
+        ? String(requestedCode).trim()
+        : `CUST-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const creditLimitValue =
+      creditLimit !== undefined && creditLimit !== null && creditLimit !== ''
+        ? parseFloat(creditLimit)
+        : 0;
+
+    const created = await Customer.create({
+      companyId,
+      customerCode,
+      name: String(name).trim(),
+      contactPerson: contactPerson || null,
+      email: email || null,
+      phone: phone || null,
+      address: address || null,
+      paymentTerms: paymentTerms || null,
+      creditLimit: Number.isFinite(creditLimitValue) ? creditLimitValue : 0,
+      taxId: taxId || null,
+      isActive: true,
+    });
+
+    return ResponseHelper.created(res, created, 'Customer created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create customer');
   }
@@ -362,14 +403,76 @@ router.get('/sales-orders', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/sales-orders', [
-  body('customerId').isInt().withMessage('Valid customer ID is required'),
-  body('orderDate').isISO8601().withMessage('Valid order date is required'),
-  body('deliveryDate').isISO8601().withMessage('Valid delivery date is required'),
-  body('items').isArray().withMessage('Items array is required')
+  // UI creates orders in a simplified shape (customer name + product/quantity/amount).
+  // We resolve/compute missing parts server-side.
+  body('customerId').optional().isInt().withMessage('customerId must be an integer'),
+  body('customer').optional().isString().withMessage('customer must be a string'),
+  body('orderDate').optional().isISO8601().withMessage('orderDate must be a date'),
+  body('deliveryDate').optional().isISO8601().withMessage('deliveryDate must be a date'),
+  body('items').optional().isArray().withMessage('items must be an array'),
+  body('amount').optional().isFloat().withMessage('amount must be a number'),
+  body('quantity').optional().isFloat().withMessage('quantity must be a number'),
+  body('product').optional().isString().withMessage('product must be a string'),
 ], async (req, res) => {
   try {
-    // TODO: Implement sales order creation logic
-    return ResponseHelper.created(res, {}, 'Sales order created successfully');
+    const companyId = req.user.companyId;
+    const {
+      customerId: requestedCustomerId,
+      customer: customerName,
+      deliveryDate,
+      orderDate,
+      amount,
+      // The UI also collects product/quantity; we store totals but do not persist order items
+      product,
+      quantity,
+    } = req.body;
+
+    let resolvedCustomerId = null;
+    if (requestedCustomerId) {
+      const cust = await Customer.findOne({
+        where: { id: parseInt(requestedCustomerId, 10), companyId },
+      });
+      resolvedCustomerId = cust?.id ?? null;
+    } else if (customerName) {
+      const cust = await Customer.findOne({
+        where: { name: String(customerName), companyId },
+      });
+      resolvedCustomerId = cust?.id ?? null;
+    }
+
+    if (!resolvedCustomerId) {
+      return ResponseHelper.badRequest(res, 'Customer is required for sales order', 'MISSING_CUSTOMER');
+    }
+
+    const orderDateValue = orderDate
+      ? String(orderDate)
+      : new Date().toISOString().slice(0, 10);
+
+    const deliveryDateValue = deliveryDate ? String(deliveryDate) : null;
+
+    const amountValue =
+      amount !== undefined && amount !== null && amount !== '' ? parseFloat(amount) : null;
+    const totalAmount = amountValue !== null && Number.isFinite(amountValue) ? amountValue : 0;
+
+    // Generate unique order number (order_number is unique).
+    const orderNumber = `SO-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const created = await SalesOrder.create({
+      companyId,
+      customerId: resolvedCustomerId,
+      orderNumber,
+      orderDate: orderDateValue,
+      deliveryDate: deliveryDateValue,
+      status: 'draft',
+      totalAmount,
+      taxAmount: 0,
+      discountAmount: 0,
+      netAmount: totalAmount,
+      notes: `Created from UI. product=${product || '—'}, quantity=${quantity ?? '—'}`,
+      createdBy: req.user.id,
+    });
+
+    return ResponseHelper.created(res, created, 'Sales order created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create sales order');
   }
@@ -567,6 +670,71 @@ router.post('/invoices/:id/send', [
     return ResponseHelper.success(res, { id }, 'Invoice sent successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to send invoice');
+  }
+});
+
+/**
+ * @swagger
+ * /sales/invoices:
+ *   post:
+ *     summary: Create a new sales invoice (UI simplified)
+ */
+router.post('/invoices', [
+  body('customerId').optional().isInt().withMessage('customerId must be an integer'),
+  body('customer').optional().isString().withMessage('customer must be a string'),
+  body('amount').isFloat({ min: 0 }).withMessage('amount must be a non-negative number'),
+  body('dueDate').isISO8601().withMessage('dueDate must be a valid date'),
+], async (req, res) => {
+  try {
+    const companyId = req.user.companyId;
+    const { customerId: requestedCustomerId, customer, amount, dueDate } = req.body;
+
+    let resolvedCustomerId = null;
+    if (requestedCustomerId) {
+      const cust = await Customer.findOne({
+        where: { id: parseInt(requestedCustomerId, 10), companyId },
+      });
+      resolvedCustomerId = cust?.id ?? null;
+    } else if (customer) {
+      const cust = await Customer.findOne({
+        where: { name: String(customer), companyId },
+      });
+      resolvedCustomerId = cust?.id ?? null;
+    }
+
+    if (!resolvedCustomerId) {
+      return ResponseHelper.badRequest(res, 'Customer is required for invoice creation', 'MISSING_CUSTOMER');
+    }
+
+    const amountValue = parseFloat(amount);
+    if (!Number.isFinite(amountValue)) {
+      return ResponseHelper.badRequest(res, 'Invalid amount', 'VALIDATION_ERROR');
+    }
+
+    const invoiceNumber = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const today = new Date().toISOString().slice(0, 10);
+
+    const created = await Invoice.create({
+      companyId,
+      invoiceNumber,
+      customerId: resolvedCustomerId,
+      invoiceType: 'sales',
+      invoiceDate: today,
+      dueDate: String(dueDate),
+      status: 'draft',
+      subtotal: amountValue,
+      taxAmount: 0,
+      discountAmount: 0,
+      totalAmount: amountValue,
+      paidAmount: 0,
+      balanceAmount: amountValue,
+      notes: null,
+      createdBy: req.user.id,
+    });
+
+    return ResponseHelper.created(res, created, 'Invoice created successfully');
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to create invoice');
   }
 });
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../services/api';
 import {
   Users,
   CheckCircle,
@@ -239,36 +240,54 @@ export const HR = () => {
       return;
     }
 
-    const employeeToAdd = {
-      id: employees.length + 1,
-      ...newEmployee,
-      salary: parseFloat(newEmployee.salary),
-      hireDate: newEmployee.hireDate || new Date().toISOString().split('T')[0]
-    };
+    (async () => {
+      try {
+        const dept = departments.find((d) => d.name === newEmployee.department);
 
-    setEmployees([...employees, employeeToAdd]);
+        const created = await apiService.createEmployee({
+          firstName: newEmployee.name,
+          lastName: '',
+          email: newEmployee.email,
+          position: newEmployee.position,
+          salary: parseFloat(newEmployee.salary),
+          hireDate: newEmployee.hireDate || new Date().toISOString().split('T')[0],
+          departmentId: dept?.id,
+          status: newEmployee.status,
+        });
 
-    // Update department employee count
-    const dept = departments.find(d => d.name === newEmployee.department);
-    if (dept) {
-      setDepartments(departments.map(d =>
-        d.name === newEmployee.department
-          ? { ...d, employees: d.employees + 1 }
-          : d
-      ));
-    }
+        const employeeToAdd = {
+          id: created?.id ?? employees.length + 1,
+          ...newEmployee,
+          salary: parseFloat(newEmployee.salary),
+          hireDate: newEmployee.hireDate || new Date().toISOString().split('T')[0],
+        };
 
-    setNewEmployee({
-      name: '',
-      email: '',
-      department: '',
-      position: '',
-      salary: '',
-      hireDate: '',
-      status: 'active'
-    });
-    setShowEmployeeModal(false);
-    showNotification('Employee added successfully', 'success');
+        setEmployees([...employees, employeeToAdd]);
+
+        // Update department employee count (local UI only)
+        if (dept) {
+          setDepartments(
+            departments.map((d) =>
+              d.name === newEmployee.department ? { ...d, employees: d.employees + 1 } : d
+            )
+          );
+        }
+
+        setNewEmployee({
+          name: '',
+          email: '',
+          department: '',
+          position: '',
+          salary: '',
+          hireDate: '',
+          status: 'active',
+        });
+        setShowEmployeeModal(false);
+        showNotification('Employee added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create employee', 'error');
+      }
+    })();
   };
 
   // Add new department
@@ -278,22 +297,40 @@ export const HR = () => {
       return;
     }
 
-    const departmentToAdd = {
-      id: departments.length + 1,
-      ...newDepartment,
-      employees: 0,
-      budget: parseFloat(newDepartment.budget)
-    };
+    (async () => {
+      try {
+        const maybeManagerId = /^\d+$/.test(String(newDepartment.manager))
+          ? parseInt(newDepartment.manager, 10)
+          : undefined;
 
-    setDepartments([...departments, departmentToAdd]);
-    setNewDepartment({
-      name: '',
-      manager: '',
-      budget: '',
-      description: ''
-    });
-    setShowDepartmentModal(false);
-    showNotification('Department added successfully', 'success');
+        const created = await apiService.createDepartment({
+          name: newDepartment.name,
+          managerId: maybeManagerId,
+          description: newDepartment.description || undefined,
+        });
+
+        const departmentToAdd = {
+          id: created?.id ?? departments.length + 1,
+          name: newDepartment.name,
+          manager: newDepartment.manager,
+          budget: parseFloat(newDepartment.budget),
+          description: newDepartment.description,
+          employees: 0,
+        };
+
+        setDepartments([...departments, departmentToAdd]);
+        setNewDepartment({
+          name: '',
+          manager: '',
+          budget: '',
+          description: '',
+        });
+        setShowDepartmentModal(false);
+        showNotification('Department added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create department', 'error');
+      }
+    })();
   };
 
   // Update employee status

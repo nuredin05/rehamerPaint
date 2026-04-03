@@ -174,19 +174,19 @@ class ApiService {
   }
 
   async createOrder(orderData) {
-    return this.post('/sales/orders', orderData);
+    return this.post('/sales/sales-orders', orderData);
   }
 
   async updateOrder(orderId, orderData) {
-    return this.put(`/sales/orders/${orderId}`, orderData);
+    return this.put(`/sales/sales-orders/${orderId}`, orderData);
   }
 
   async updateOrderStatus(orderId, status) {
-    return this.put(`/sales/orders/${orderId}/status`, { status });
+    return this.put(`/sales/sales-orders/${orderId}/status`, { status });
   }
 
   async deleteOrder(orderId) {
-    return this.delete(`/sales/orders/${orderId}`);
+    return this.delete(`/sales/sales-orders/${orderId}`);
   }
 
   // Customers
@@ -444,11 +444,11 @@ class ApiService {
   }
 
   async getBillOfMaterials(params = {}) {
-    return this.get('/manufacturing/bill-of-materials', params);
+    return this.get('/manufacturing/bom', params);
   }
 
   async createBillOfMaterials(bomData) {
-    return this.post('/manufacturing/bill-of-materials', bomData);
+    return this.post('/manufacturing/bom', bomData);
   }
 
   async getQualityChecks(params = {}) {
@@ -462,19 +462,19 @@ class ApiService {
   // ==================== LOGISTICS MODULE ====================
   
   async getDeliveries(params = {}) {
-    return this.get('/logistics/deliveries', params);
+    return this.get('/logistics/delivery-orders', params);
   }
 
   async createDelivery(deliveryData) {
-    return this.post('/logistics/deliveries', deliveryData);
+    return this.post('/logistics/delivery-orders', deliveryData);
   }
 
   async updateDelivery(deliveryId, deliveryData) {
-    return this.put(`/logistics/deliveries/${deliveryId}`, deliveryData);
+    return this.put(`/logistics/delivery-orders/${deliveryId}`, deliveryData);
   }
 
   async deleteDelivery(deliveryId) {
-    return this.delete(`/logistics/deliveries/${deliveryId}`);
+    return this.delete(`/logistics/delivery-orders/${deliveryId}`);
   }
 
   async getVehicles(params = {}) {

@@ -405,8 +405,19 @@ router.post('/companies', [
   body('email').optional().isEmail().withMessage('Valid email is required')
 ], async (req, res) => {
   try {
-    // TODO: Implement company creation logic (admin only)
-    return ResponseHelper.created(res, {}, 'Company created successfully');
+    const { name, code, address, phone, email, taxId } = req.body;
+
+    const created = await Company.create({
+      name: String(name).trim(),
+      code: String(code).trim(),
+      address: address || null,
+      phone: phone || null,
+      email: email || null,
+      taxId: taxId || null,
+      isActive: true,
+    });
+
+    return ResponseHelper.created(res, created, 'Company created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create company');
   }

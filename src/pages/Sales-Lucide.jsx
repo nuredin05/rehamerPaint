@@ -32,9 +32,18 @@ export const Sales = () => {
   const [activeTab, setActiveTab] = useState('orders');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: ordersRaw, loading: ordersLoading } = useApiData(() => apiService.getOrders(), []);
-  const { data: customersRaw, loading: customersLoading } = useApiData(() => apiService.getCustomers(), []);
-  const { data: invoicesRaw, loading: invoicesLoading } = useApiData(() => apiService.getInvoices(), []);
+  const { data: ordersRaw, loading: ordersLoading, refetch: refetchOrders } = useApiData(
+    () => apiService.getOrders(),
+    []
+  );
+  const { data: customersRaw, loading: customersLoading, refetch: refetchCustomers } = useApiData(
+    () => apiService.getCustomers(),
+    []
+  );
+  const { data: invoicesRaw, loading: invoicesLoading, refetch: refetchInvoices } = useApiData(
+    () => apiService.getInvoices(),
+    []
+  );
 
   const orders = Array.isArray(ordersRaw) ? ordersRaw : [];
   const customers = Array.isArray(customersRaw) ? customersRaw : [];
@@ -71,16 +80,73 @@ export const Sales = () => {
 
   const { notification, showNotification } = useNotification();
 
-  const handleAddOrder = () => {
-    showNotification('Create order via API is not wired to this form yet.', 'error');
+  const handleAddOrder = async () => {
+    try {
+      if (!newOrder.customer || !newOrder.product || !newOrder.quantity || !newOrder.amount) {
+        showNotification('Please fill Customer, Product, Quantity, and Amount.', 'error');
+        return;
+      }
+
+      await apiService.createOrder({
+        customer: newOrder.customer,
+        product: newOrder.product,
+        quantity: parseFloat(newOrder.quantity),
+        amount: parseFloat(newOrder.amount),
+        deliveryDate: newOrder.deliveryDate || undefined,
+      });
+
+      setShowOrderModal(false);
+      setNewOrder({ customer: '', product: '', quantity: '', amount: '', deliveryDate: '' });
+      showNotification('Order created successfully', 'success');
+      refetchOrders();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to create order', 'error');
+    }
   };
 
-  const handleAddCustomer = () => {
-    showNotification('Create customer via API is not wired to this form yet.', 'error');
+  const handleAddCustomer = async () => {
+    try {
+      if (!newCustomer.name || !newCustomer.email) {
+        showNotification('Please fill Customer Name and Email.', 'error');
+        return;
+      }
+
+      await apiService.createCustomer({
+        name: newCustomer.name,
+        email: newCustomer.email,
+        phone: newCustomer.phone,
+        status: newCustomer.status,
+      });
+
+      setShowCustomerModal(false);
+      setNewCustomer({ name: '', email: '', phone: '', status: 'active' });
+      showNotification('Customer created successfully', 'success');
+      refetchCustomers();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to create customer', 'error');
+    }
   };
 
-  const handleAddInvoice = () => {
-    showNotification('Create invoice via API is not wired to this form yet.', 'error');
+  const handleAddInvoice = async () => {
+    try {
+      if (!newInvoice.customer || !newInvoice.amount || !newInvoice.dueDate) {
+        showNotification('Please fill Customer, Amount, and Due Date.', 'error');
+        return;
+      }
+
+      await apiService.createInvoice({
+        customer: newInvoice.customer,
+        amount: parseFloat(newInvoice.amount),
+        dueDate: newInvoice.dueDate,
+      });
+
+      setShowInvoiceModal(false);
+      setNewInvoice({ customer: '', amount: '', dueDate: '' });
+      showNotification('Invoice created successfully', 'success');
+      refetchInvoices();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to create invoice', 'error');
+    }
   };
 
   const updateOrderStatus = () => {

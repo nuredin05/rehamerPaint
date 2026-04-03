@@ -31,8 +31,14 @@ export const Inventory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [productFormMode, setProductFormMode] = useState('add'); // 'add' | 'edit'
+  const [editingProductId, setEditingProductId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const { notification, showNotification } = useNotification();
+  const [showStockModal, setShowStockModal] = useState(false);
+  const [stockAction, setStockAction] = useState('in'); // 'in' | 'out'
+  const [stockProduct, setStockProduct] = useState(null);
+  const [stockQuantity, setStockQuantity] = useState('');
 
   const { data: productsRaw, loading: productsLoading, refetch: refetchProducts } = useApiData(
     () => apiService.getProducts(),
@@ -89,12 +95,103 @@ export const Inventory = () => {
     );
   };
 
-  const handleAddProduct = () => {
-    showNotification('Create product via API is not wired in this form yet — use DB or extend POST /inventory/products.', 'error');
+  const resetProductForm = () => {
+    setProductFormMode('add');
+    setEditingProductId(null);
+    setNewProduct({ name: '', sku: '', stock: '', price: '', status: 'in-stock' });
   };
 
-  const deleteProduct = () => {
-    showNotification('Delete product API not enabled from this UI.', 'error');
+  const handleAddProduct = async () => {
+    try {
+      if (!newProduct.name || !newProduct.sku || newProduct.stock === '' || newProduct.price === '') {
+        showNotification('Please fill Product Name, SKU, Stock, and Price.', 'error');
+        return;
+      }
+
+      const payload = {
+        name: newProduct.name,
+        sku: newProduct.sku,
+        stock: parseFloat(newProduct.stock),
+        price: parseFloat(newProduct.price),
+      };
+
+      if (productFormMode === 'edit') {
+        await apiService.updateProduct(editingProductId, payload);
+        showNotification('Product updated successfully', 'success');
+      } else {
+        await apiService.createProduct(payload);
+        showNotification('Product added successfully', 'success');
+      }
+
+      setShowAddModal(false);
+      resetProductForm();
+      refetchProducts();
+      refetchTransactions();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to save product', 'error');
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!productId) return;
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+
+    try {
+      await apiService.deleteProduct(productId);
+      showNotification('Product deleted successfully', 'success');
+      refetchProducts();
+      refetchTransactions();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to delete product', 'error');
+    }
+  };
+
+  const openEditProduct = (product) => {
+    setProductFormMode('edit');
+    setEditingProductId(product.id);
+    setNewProduct({
+      name: product.name || '',
+      sku: product.sku || '',
+      stock: String(product.stock ?? 0),
+      price: String(product.price ?? 0),
+      status: product.status || 'in-stock',
+    });
+    setShowAddModal(true);
+  };
+
+  const openStockModal = (product, action) => {
+    setStockProduct(product);
+    setStockAction(action);
+    setStockQuantity('');
+    setShowStockModal(true);
+  };
+
+  const submitStockAction = async () => {
+    if (!stockProduct) return;
+    const qty = parseFloat(stockQuantity);
+    if (!Number.isFinite(qty) || qty <= 0) {
+      showNotification('Enter a valid quantity (> 0).', 'error');
+      return;
+    }
+
+    const transactionType = stockAction === 'in' ? 'purchase' : 'sale';
+    try {
+      await apiService.createInventoryTransaction({
+        productId: stockProduct.id,
+        transactionType,
+        quantity: qty,
+        referenceType: 'adjustment',
+        referenceId: 0,
+      });
+      showNotification(`Stock ${stockAction === 'in' ? 'in' : 'out'} recorded successfully`, 'success');
+      setShowStockModal(false);
+      setStockProduct(null);
+      setStockQuantity('');
+      refetchProducts();
+      refetchTransactions();
+    } catch (e) {
+      showNotification(e?.message || 'Failed to record stock movement', 'error');
+    }
   };
 
   const viewItemDetails = (item) => {
@@ -303,13 +400,25 @@ export const Inventory = () => {
                           >
                             <Eye size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Edit Product">
+                          <button
+                            onClick={() => openEditProduct(product)}
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
+                            title="Edit Product"
+                          >
                             <Edit size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Stock In">
+                          <button
+                            onClick={() => openStockModal(product, 'in')}
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
+                            title="Stock In"
+                          >
                             <ArrowDownLeft size={16} />
                           </button>
-                          <button className="text-primaryClr hover:text-primaryClrLight p-1" title="Stock Out">
+                          <button
+                            onClick={() => openStockModal(product, 'out')}
+                            className="text-primaryClr hover:text-primaryClrLight p-1"
+                            title="Stock Out"
+                          >
                             <ArrowUpRight size={16} />
                           </button>
                           <button
@@ -365,10 +474,13 @@ export const Inventory = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
                 <Plus size={20} />
-                <span>Add New Product</span>
+                <span>{productFormMode === 'edit' ? 'Edit Product' : 'Add New Product'}</span>
               </h2>
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setShowAddModal(false);
+                  resetProductForm();
+                }}
                 className="text-place hover:text-primaryClr"
               >
                 <X size={20} />
@@ -414,7 +526,10 @@ export const Inventory = () => {
             </div>
             <div className="flex justify-end space-x-3 mt-6">
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setShowAddModal(false);
+                  resetProductForm();
+                }}
                 className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
                 <X size={16} />
@@ -425,7 +540,71 @@ export const Inventory = () => {
                 className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
               >
                 <Check size={16} />
-                <span>Add Product</span>
+                <span>{productFormMode === 'edit' ? 'Update Product' : 'Add Product'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stock In/Out Modal */}
+      {showStockModal && stockProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-primaryClr flex items-center space-x-2">
+                <Package size={20} />
+                <span>Stock {stockAction === 'in' ? 'In' : 'Out'}</span>
+              </h2>
+              <button
+                onClick={() => {
+                  setShowStockModal(false);
+                  setStockProduct(null);
+                  setStockQuantity('');
+                }}
+                className="text-place hover:text-primaryClr"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-primaryClr mb-1">Product</label>
+                <div className="px-3 py-2 border border-secondaryClr rounded-lg bg-bgLight">
+                  {stockProduct.name} ({stockProduct.sku})
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-primaryClr mb-1">Quantity *</label>
+                <input
+                  type="number"
+                  value={stockQuantity}
+                  onChange={(e) => setStockQuantity(e.target.value)}
+                  className="w-full px-3 py-2 border border-secondaryClr rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryClr"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowStockModal(false);
+                  setStockProduct(null);
+                  setStockQuantity('');
+                }}
+                className="bg-secondaryClr hover:bg-primaryClrLight text-primaryClr px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+              >
+                <X size={16} />
+                <span>Cancel</span>
+              </button>
+              <button
+                onClick={submitStockAction}
+                className="bg-primaryClr hover:bg-primaryClrDark text-primaryClrText px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+              >
+                <Check size={16} />
+                <span>Confirm</span>
               </button>
             </div>
           </div>

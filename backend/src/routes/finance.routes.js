@@ -1,11 +1,14 @@
 const express = require('express');
 const { body, query, param } = require('express-validator');
 const ResponseHelper = require('../utils/responseHelper');
+const { authenticate } = require('../middleware/auth.middleware');
 const { ChartOfAccounts, Transaction, Sequelize, sequelize } = require('../models');
 
 const router = express.Router();
 const { Op } = Sequelize;
 const isSchemaIssue = (error) => /doesn't exist|Unknown column/i.test(error?.original?.sqlMessage || error?.message || '');
+
+router.use(authenticate);
 
 /**
  * @swagger
@@ -103,6 +106,94 @@ LIMIT :limit OFFSET :offset`;
       return ResponseHelper.success(res, [], 'Chart of accounts retrieved successfully');
     }
     return ResponseHelper.error(res, 'Failed to retrieve chart of accounts');
+  }
+});
+
+/**
+ * @swagger
+ * /finance/accounts:
+ *   get:
+ *     summary: Alias for chart of accounts
+ */
+router.get('/accounts', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 100 }),
+  query('search').optional().isString(),
+], async (req, res) => {
+  try {
+    const conditions = [];
+    const replacements = {};
+
+    if (req.user?.companyId) {
+      conditions.push('company_id = :companyId');
+      replacements.companyId = req.user.companyId;
+    }
+    if (req.query.search) {
+      conditions.push('(code LIKE :search OR name LIKE :search)');
+      replacements.search = `%${req.query.search}%`;
+    }
+
+    replacements.limit = Math.min(parseInt(req.query.limit, 10) || 100, 200);
+    replacements.offset = ((parseInt(req.query.page, 10) || 1) - 1) * replacements.limit;
+
+    const sql = `SELECT id, company_id AS companyId, code AS accountCode, name AS accountName, type AS accountType,
+      parent_id AS parentId, is_active AS isActive, created_at AS createdAt, updated_at AS updatedAt
+      FROM chart_of_accounts
+      ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
+      ORDER BY code ASC
+      LIMIT :limit OFFSET :offset`;
+
+    const [rows] = await sequelize.query(sql, { replacements });
+    return ResponseHelper.success(res, rows, 'Accounts retrieved successfully');
+  } catch (error) {
+    return ResponseHelper.error(res, 'Failed to retrieve accounts');
+  }
+});
+
+/**
+ * @swagger
+ * /finance/accounts:
+ *   post:
+ *     summary: Create a new account (simplified)
+ */
+router.post('/accounts', [
+  body('name').notEmpty().withMessage('Account name is required'),
+  body('type').optional().isString(),
+  body('accountNumber').optional().isString(),
+  body('bank').optional().isString(),
+], async (req, res) => {
+  try {
+    const companyId = req.user?.companyId;
+    const { name, type, accountNumber } = req.body;
+
+    if (!companyId) return ResponseHelper.unauthorized(res, 'Unauthorized');
+
+    const mapAccountType = (uiType) => {
+      const t = String(uiType || '').toLowerCase();
+      if (['checking', 'savings', 'cash'].includes(t)) return 'asset';
+      if (t === 'income') return 'revenue';
+      if (t === 'expense') return 'expense';
+      return 'asset';
+    };
+
+    const accountType = mapAccountType(type);
+    const requestedCode = accountNumber && String(accountNumber).trim() ? String(accountNumber).trim() : '';
+    const accountCode =
+      requestedCode.length <= 20 ? requestedCode : `ACC-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const created = await ChartOfAccounts.create({
+      companyId,
+      accountCode,
+      accountName: String(name).trim(),
+      accountType,
+      parentId: null,
+      isActive: true,
+    });
+
+    return ResponseHelper.created(res, created, 'Account added successfully');
+  } catch (error) {
+    // Keep behavior tolerant like other module routes
+    return ResponseHelper.error(res, 'Failed to create account');
   }
 });
 
@@ -293,16 +384,56 @@ router.get('/transactions', [
  *         $ref: '#/components/responses/ForbiddenError'
  */
 router.post('/transactions', [
-  body('transactionNumber').notEmpty().withMessage('Transaction number is required'),
-  body('transactionDate').isISO8601().withMessage('Valid transaction date is required'),
-  body('description').notEmpty().withMessage('Description is required'),
-  body('referenceType').isIn(['invoice', 'payment', 'purchase', 'expense', 'journal']).withMessage('Valid reference type is required'),
-  body('referenceId').isInt().withMessage('Valid reference ID is required'),
-  body('entries').isArray().withMessage('Entries array is required')
+  // UI creates transactions with simplified fields; validators are relaxed accordingly.
+  body('transactionNumber').optional().isString(),
+  body('transactionDate').optional().isISO8601(),
+  body('description').optional().isString(),
+  body('referenceType').optional().isString(),
+  body('referenceId').optional().isInt(),
+  body('entries').optional().isArray()
 ], async (req, res) => {
   try {
-    // TODO: Implement transaction creation logic
-    return ResponseHelper.created(res, {}, 'Transaction created successfully');
+    const companyId = req.user.companyId;
+    const createdBy = req.user.id;
+
+    const amountValueRaw = req.body.amount !== undefined ? req.body.amount : req.body.transactionAmount;
+    const amount = amountValueRaw !== undefined && amountValueRaw !== null && amountValueRaw !== ''
+      ? parseFloat(amountValueRaw)
+      : NaN;
+
+    if (!Number.isFinite(amount)) {
+      return ResponseHelper.badRequest(res, 'Valid amount is required');
+    }
+
+    const referenceType = req.body.referenceType ? String(req.body.referenceType) : 'journal';
+    const referenceId = req.body.referenceId !== undefined && req.body.referenceId !== null
+      ? parseInt(req.body.referenceId, 10)
+      : 0;
+
+    const transactionNumber = req.body.transactionNumber
+      ? String(req.body.transactionNumber).trim()
+      : `TRX-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+    const transactionDate = req.body.transactionDate ? String(req.body.transactionDate) : new Date().toISOString().slice(0, 10);
+    const description = req.body.description ? String(req.body.description) : 'Financial transaction';
+
+    // Minimal balancing: keep it balanced even if UI doesn't send entries.
+    const absAmount = Math.abs(amount);
+
+    const created = await Transaction.create({
+      companyId,
+      transactionNumber,
+      transactionDate,
+      description,
+      referenceType,
+      referenceId,
+      totalDebit: absAmount,
+      totalCredit: absAmount,
+      status: 'draft',
+      createdBy
+    });
+
+    return ResponseHelper.created(res, created, 'Transaction created successfully');
   } catch (error) {
     return ResponseHelper.error(res, 'Failed to create transaction');
   }

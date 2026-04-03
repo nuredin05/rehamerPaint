@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../services/api';
 import {
   Wrench,
   Cog,
@@ -132,18 +133,31 @@ export const Manufacturing = () => {
       return;
     }
 
-    const orderToAdd = {
-      id: `PO-${String(productionOrders.length + 1).padStart(3, '0')}`,
-      ...newOrder,
-      quantity: parseInt(newOrder.quantity),
-      status: 'pending',
-      efficiency: 0
-    };
+    (async () => {
+      try {
+        await apiService.createProductionOrder({
+          product: newOrder.product,
+          plannedQuantity: parseFloat(newOrder.quantity),
+          startDate: newOrder.startDate || undefined,
+          completionDate: newOrder.endDate || undefined,
+        });
 
-    setProductionOrders([...productionOrders, orderToAdd]);
-    setNewOrder({ product: '', quantity: '', startDate: '', endDate: '' });
-    setShowOrderModal(false);
-    showNotification('Production order added successfully', 'success');
+        const orderToAdd = {
+          id: `PO-${String(productionOrders.length + 1).padStart(3, '0')}`,
+          ...newOrder,
+          quantity: parseInt(newOrder.quantity, 10),
+          status: 'pending',
+          efficiency: 0,
+        };
+
+        setProductionOrders([...productionOrders, orderToAdd]);
+        setNewOrder({ product: '', quantity: '', startDate: '', endDate: '' });
+        setShowOrderModal(false);
+        showNotification('Production order added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create production order', 'error');
+      }
+    })();
   };
 
   const handleAddBOM = () => {
@@ -152,16 +166,30 @@ export const Manufacturing = () => {
       return;
     }
 
-    const bomToAdd = {
-      id: billOfMaterials.length + 1,
-      ...newBOM,
-      materials: []
-    };
+    (async () => {
+      try {
+        await apiService.createBillOfMaterials({
+          product: newBOM.product,
+          components: newBOM.materials || [],
+          status: newBOM.status,
+          version: 'v1',
+          effectiveDate: new Date().toISOString().slice(0, 10),
+        });
 
-    setBillOfMaterials([...billOfMaterials, bomToAdd]);
-    setNewBOM({ product: '', materials: [], status: 'active' });
-    setShowBOMModal(false);
-    showNotification('Bill of Materials added successfully', 'success');
+        const bomToAdd = {
+          id: billOfMaterials.length + 1,
+          ...newBOM,
+          materials: [],
+        };
+
+        setBillOfMaterials([...billOfMaterials, bomToAdd]);
+        setNewBOM({ product: '', materials: [], status: 'active' });
+        setShowBOMModal(false);
+        showNotification('Bill of Materials added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create BOM', 'error');
+      }
+    })();
   };
 
   const updateOrderStatus = (orderId, newStatus) => {

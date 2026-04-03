@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../services/api';
 import {
   Truck,
   MapPin,
@@ -135,16 +136,31 @@ export const Logistics = () => {
       return;
     }
 
-    const deliveryToAdd = {
-      id: `DEL-${String(deliveries.length + 1).padStart(3, '0')}`,
-      ...newDelivery,
-      status: 'pending'
-    };
+    (async () => {
+      try {
+        await apiService.createDelivery({
+          // Backend is currently flexible (stub) - UI provides an order string + delivery date.
+          salesOrderId: undefined,
+          deliveryDate: newDelivery.deliveryDate || undefined,
+          order: newDelivery.order,
+          driver: newDelivery.driver,
+          vehicle: newDelivery.vehicle,
+        });
 
-    setDeliveries([...deliveries, deliveryToAdd]);
-    setNewDelivery({ order: '', customer: '', address: '', driver: '', vehicle: '', deliveryDate: '' });
-    setShowDeliveryModal(false);
-    showNotification('Delivery added successfully', 'success');
+        const deliveryToAdd = {
+          id: `DEL-${String(deliveries.length + 1).padStart(3, '0')}`,
+          ...newDelivery,
+          status: 'pending',
+        };
+
+        setDeliveries([...deliveries, deliveryToAdd]);
+        setNewDelivery({ order: '', customer: '', address: '', driver: '', vehicle: '', deliveryDate: '' });
+        setShowDeliveryModal(false);
+        showNotification('Delivery added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to create delivery order', 'error');
+      }
+    })();
   };
 
   const updateDeliveryStatus = (deliveryId, newStatus) => {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import apiService from '../services/api';
 import {
   DollarSign,
   TrendingUp,
@@ -168,34 +169,54 @@ export const Finance = () => {
       return;
     }
 
-    const transactionToAdd = {
-      id: `TRX-${String(transactions.length + 1).padStart(3, '0')}`,
-      ...newTransaction,
-      amount: newTransaction.type === 'expense' ? -Math.abs(newTransaction.amount) : Math.abs(newTransaction.amount),
-      status: 'completed'
-    };
+    (async () => {
+      try {
+        await apiService.createTransaction({
+          transactionNumber: undefined,
+          transactionDate: newTransaction.date,
+          description: newTransaction.description,
+          referenceType: newTransaction.type === 'expense' ? 'expense' : 'journal',
+          referenceId: 0,
+          entries: [],
+          amount: parseFloat(newTransaction.amount),
+          category: newTransaction.category,
+        });
 
-    setTransactions([...transactions, transactionToAdd]);
+        const transactionToAdd = {
+          id: `TRX-${String(transactions.length + 1).padStart(3, '0')}`,
+          ...newTransaction,
+          amount:
+            newTransaction.type === 'expense'
+              ? -Math.abs(newTransaction.amount)
+              : Math.abs(newTransaction.amount),
+          status: 'completed',
+        };
 
-    // Update account balance
-    const mainAccount = accounts.find(acc => acc.id === 1);
-    if (mainAccount) {
-      setAccounts(accounts.map(acc =>
-        acc.id === 1
-          ? { ...acc, balance: acc.balance + transactionToAdd.amount }
-          : acc
-      ));
-    }
+        setTransactions([...transactions, transactionToAdd]);
 
-    setNewTransaction({
-      type: 'income',
-      category: '',
-      description: '',
-      amount: '',
-      date: new Date().toISOString().split('T')[0]
-    });
-    setShowTransactionModal(false);
-    showNotification('Transaction added successfully', 'success');
+        // Update account balance (local UI only)
+        const mainAccount = accounts.find((acc) => acc.id === 1);
+        if (mainAccount) {
+          setAccounts(
+            accounts.map((acc) =>
+              acc.id === 1 ? { ...acc, balance: acc.balance + transactionToAdd.amount } : acc
+            )
+          );
+        }
+
+        setNewTransaction({
+          type: 'income',
+          category: '',
+          description: '',
+          amount: '',
+          date: new Date().toISOString().split('T')[0],
+        });
+        setShowTransactionModal(false);
+        showNotification('Transaction added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to add transaction', 'error');
+      }
+    })();
   };
 
   // Add new account
@@ -205,22 +226,36 @@ export const Finance = () => {
       return;
     }
 
-    const accountToAdd = {
-      id: accounts.length + 1,
-      ...newAccount,
-      balance: parseFloat(newAccount.balance)
-    };
+    (async () => {
+      try {
+        const created = await apiService.createAccount({
+          name: newAccount.name,
+          type: newAccount.type,
+          accountNumber: newAccount.accountNumber,
+          bank: newAccount.bank,
+          balance: parseFloat(newAccount.balance),
+        });
 
-    setAccounts([...accounts, accountToAdd]);
-    setNewAccount({
-      name: '',
-      type: 'checking',
-      balance: '',
-      bank: '',
-      accountNumber: ''
-    });
-    setShowAccountModal(false);
-    showNotification('Account added successfully', 'success');
+        const accountToAdd = {
+          id: created?.id ?? accounts.length + 1,
+          ...newAccount,
+          balance: parseFloat(newAccount.balance),
+        };
+
+        setAccounts([...accounts, accountToAdd]);
+        setNewAccount({
+          name: '',
+          type: 'checking',
+          balance: '',
+          bank: '',
+          accountNumber: '',
+        });
+        setShowAccountModal(false);
+        showNotification('Account added successfully', 'success');
+      } catch (e) {
+        showNotification(e?.message || 'Failed to add account', 'error');
+      }
+    })();
   };
 
   // Update transaction status
