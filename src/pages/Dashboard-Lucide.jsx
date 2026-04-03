@@ -28,10 +28,10 @@ export const Dashboard = () => {
               <Package size={24} className="text-primaryClr" />
             </div>
             <div className="ml-5 w-0 flex-1">
-              <dl>
+              <d>
                 <dt className="text-sm font-medium text-place truncate">Total Products</dt>
                 <dd className="text-lg font-medium text-primaryClr">1,234</dd>
-              </dl>
+              </d>
             </div>
           </div>
         </div>
